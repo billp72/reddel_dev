@@ -1,0 +1,41 @@
+<ion-view id="userMessagesView" view-title="Question for {{roomName}}">
+    <ion-nav-title>
+           Question for {{roomName}}
+        </ion-nav-title>
+    <ion-content has-bouncing="true" class="has-header has-footer" delegate-handle="userMessageScroll">
+        <ion-list ng-show="roomName">
+            <ion-item class="special-text"><pre>{{question}}</pre>
+                <ion-option-button class="button-assertive" ng-click="removeConversation()">
+                    wrap
+                </ion-option-button>
+            </ion-item>
+            <ion-item ng-if="chats.length == 0" class="textCenter">
+                <h4>No messages in this room. Send message to start.</h4>
+            </ion-item>
+            <!--'createdAt':true-->
+            <ion-item ng-repeat="chat in chats | orderBy:reverse" type="item-text-wrap">
+                <h4 class="advisors">{{chat.from}} :</h4>
+                <span am-time-ago="chat.createdAt" class="item-note">
+                </span>
+                <pre my-links links="chat"></pre>
+                <ion-option-button class="button-assertive" ng-click="remove(chat, $index)">
+                    Delete
+                </ion-option-button>
+            </ion-item>
+        </ion-list>
+        <ion-list ng-hide="roomName">
+            <ion-item class="textCenter">
+                <h4>Please select a room to chat first.</h4>
+            </ion-item>
+        </ion-list>
+
+    </ion-content> 
+    <ion-footer-bar>
+        <label class="item-input-wrapper nobgcolor">
+            <input type="text" ng-model="IM.textMessage" placeholder="Type in your message...">
+        </label>
+            <button ng-click="sendMessage(IM.textMessage)" class="button button-small button-balanced">
+                Send
+        </button>
+    </ion-footer-bar> 
+</ion-view>
