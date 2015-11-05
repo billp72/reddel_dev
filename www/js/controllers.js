@@ -602,6 +602,7 @@ settings for mentor
         schoolsQuestionID   = $state.params.schoolsQuestionID,
         displayName         = $state.params.displayName,
         group               = $state.params.group,
+        wrap                = $state.params.wrap,
         toggleUserID        = '',
         toggleQuestionID    = '',
         firstMessage        = false;
@@ -615,6 +616,11 @@ settings for mentor
     $scope.IM = {
         textMessage: ""
     };
+    if(!wrap){
+        $scope.wontWrap = true;
+    }else{
+        $scope.wontWrap = false;
+    }
     var txtInput;
     $timeout(function(){
         footerBar = document.body.querySelector('#userMessagesView .bar-footer');
@@ -781,8 +787,9 @@ settings for mentor
                 displayName: '',
                 question: question,
                 group: groupID,
+                wrap: 'wrap'
             });
-            Users.toggleQuestionBackAfterClick($scope.userID, selfKey);
+            //Users.toggleQuestionBackAfterClick($scope.userID, selfKey);
         }
     }
 }])
@@ -842,11 +849,12 @@ settings for mentor
        }else{
              $state.go('menu.tab.publicchat', {
                 prospectUserID: prospectUserID,
-                prospectQuestionID: prospectQuestionID,
+                prospectQuestionID: prospectQuestionID,//not currently avaiable for wrap question
                 schoolsQuestionID: schoolsQuestionID,
                 displayName: displayName,
                 question: question,
                 group: $scope.groupID,
+                wrap: ''//hides ability to wrap question
             });
        }
     }

@@ -196,9 +196,9 @@ angular.module('mychat.services', ['firebase'])
                     schoolID: schoolID,
                     createdAt: Firebase.ServerValue.TIMESTAMP
                 };
-                 chats.$add(chatMessage).then(function (data) {
-                    Users.getRef().child(toggleUserID).child('questions').child(toggleQuestionID)
-                        .update({'conversationStarted':true});
+                chats.$add(chatMessage).then(function (data) {
+                    /*Users.getRef().child(toggleUserID).child('questions').child(toggleQuestionID)
+                        .update({'conversationStarted':true});*/
             
                 });
               
@@ -309,7 +309,8 @@ angular.module('mychat.services', ['firebase'])
                         prospectUserID: prospectUserID,
                         displayName: displayName,
                         email: email, 
-                        icon: icon
+                        icon: icon,
+                        status: 'private'
                     });
             }else{
                 return user.$add(
@@ -374,50 +375,24 @@ angular.module('mychat.services', ['firebase'])
             var arr = $firebase(ref.child(schoolID)).$asArray();
             var deferred = $q.defer();
             var added;
+            var groupID = stripDot.generatePass();
 
-            arr.$loaded(function(data){
-                if(!!data && data.length){
-                    var groupID = stripDot.generatePass();
-                    arr.$add({'groupName':groupName, 'groupID': groupID}).then(function(data){
-                            $timeout( function(){
-        
-                                deferred.resolve({
-                                    key: function(){ 
-                                        return {
-                                            'groupKey': data.key(),
-                                            'groupID': groupID
-                                        }
-                                    }
+                arr.$add({'groupName':groupName, 'groupID': groupID}).then(function(data){
+                    $timeout( function(){
+                        deferred.resolve({
+                            key: function(){ 
+                                return {
+                                    'groupKey': data.key(),
+                                    'groupID': groupID
+                                }
+                            }
+                        });
 
-                                });
-
-                            }, 200);
+                    }, 200);
 
                         cb(deferred.promise);
-                    });
-                }else{
-                    var groupID = stripDot.generatePass();
-                    var newGroup = ref.child(schoolID);
-                    var newRef = newGroup.push();
-                        newRef.set({'groupName':groupName, 'groupID': groupID});
-
-                        $timeout( function(){
-        
-                            deferred.resolve({
-                                key: function(){ 
-                                    return {
-                                        'groupKey': newRef.key(),
-                                        'groupID': groupID
-                                    }
-                                }
-
-                            });
-
-                        }, 200);
-
-                    cb(deferred.promise);
-                }
-            });
+                });
+               
             
        },
        /*part of add/edit group - this deletes the group

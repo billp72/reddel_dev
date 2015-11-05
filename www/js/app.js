@@ -163,7 +163,7 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
         }
     })
       .state('menu.tab.publicchat', {
-        url: '/chat/:prospectUserID/:prospectQuestionID/:schoolsQuestionID/:displayName/:question/:group',
+        url: '/chat/:prospectUserID/:prospectQuestionID/:schoolsQuestionID/:displayName/:question/:group/:wrap',
         views: {
             'tab-publicchat':{
                 templateUrl: 'templates/tab-chat.html',
