@@ -778,7 +778,7 @@ settings for mentor
                 prospectUserID: $scope.userID,
                 prospectQuestionID: selfKey,
                 schoolsQuestionID: publicQuestionKey,
-                displayName: displayName,
+                displayName: '',
                 question: question,
                 group: groupID,
             });
@@ -945,7 +945,8 @@ settings for mentor
                             false,
                             grpName,
                             status,
-                            grpID 
+                            grpID,
+                            null 
                         ).then(function(data){
                             Rooms.addQuestionsToSchool(
                                 $scope.schoolID, 
