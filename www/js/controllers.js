@@ -195,7 +195,7 @@ angular.module('mychat.controllers', [])
             });
         }else{
             alert("Please fill all details properly");
-	    }
+        }
     }
     $scope.openSignIn = function (){
         $ionicModal.fromTemplateUrl('templates/login2.html', {
@@ -797,8 +797,8 @@ settings for mentor
 /*this controller is for public questions
 *
 */
-.controller('AdvisorCtrl', ['$scope', '$rootScope', 'Users', 'Chats', 'Rooms', '$state', '$window', 
-    function ($scope, $rootScope, Users, Chats, Rooms, $state, $window) {
+.controller('AdvisorCtrl', ['$scope', '$rootScope', 'Users', 'Chats', 'Rooms', '$state', '$window', 'groupsMentorData',
+    function ($scope, $rootScope, Users, Chats, Rooms, $state, $window, groupsMentorData) {
     console.log("Student Controller initialized");
     
     if(!$scope.schoolID){
@@ -813,7 +813,25 @@ settings for mentor
     $scope.askQuestion = function(){
         $state.go('menu.tab.ask');
     }
+    $scope.user = {}
+    $scope.data = {'list': ''};
 
+    groupsMentorData.getGroupByID($scope.schoolID, function (matches){
+        $scope.user.group = matches[0];
+        $scope.data.list = matches;
+
+        $scope.group = {
+                'groupID': matches[0].groupID,
+                'groupName': matches[0].groupName
+        }
+    });
+
+    $scope.update = function (data){
+            $scope.group = {
+                'groupID': data.groupID,
+                'groupName': data.groupName
+            }
+    }
     $scope.$watch('group', function(oldValue, newValue){
         var val;
         if(!!oldValue){
@@ -824,7 +842,8 @@ settings for mentor
 
         $scope.groupID = val.groupID;
         $scope.title1 = val.groupName;
-        $scope.school = Rooms.getSchoolBySchoolID($scope.schoolID, $scope.groupID);
+
+        $scope.school = Rooms.getSchoolBySchoolID($scope.schoolID, val.groupID);
             $scope.school.$loaded(function(data){
                 $scope.rooms = data;
         });
@@ -882,7 +901,7 @@ settings for mentor
     $scope.user = {}
     $scope.data = { 'listg' : '', 'search' : '', 'groups': ''};
 
-   //ng-show="hasEmail" 
+
    $scope.searchg = function() {
      groupsMentorsDataService.retrieveDataSort($scope.data.groups, function(promise){
                 promise.then(
@@ -901,7 +920,8 @@ settings for mentor
                 return;
           } 
           
-          status = !quest.ischecked ? 'private' : 'public';
+          //status = !quest.ischecked ? 'private' : 'public';
+          status = 'private';
           grpID = quest.group.groupID;
           grpName = quest.group.groupName;
                 if(quest.question.amount >= 15){

@@ -1,11 +1,11 @@
 // MyChat App - Ionic & Firebase Demo
-
 var firebaseUrl = "https://reddel.firebaseio.com";
 
 function onDeviceReady() {
-    setTimeout(function() { 
 
-        navigator.splashscreen.hide(); 
+    setTimeout(function() {
+
+        navigator.splashscreen.hide();
 
     }, 3000);
 
@@ -23,16 +23,16 @@ document.addEventListener("deviceready", onDeviceReady, false);
 // 'mychat.controllers' is found in controllers.js
 angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controllers', 'mychat.services', 'mychat.directives', 'mychat.autocomplete'])
 
-.run(function ($ionicPlatform, $rootScope, $location, $state, Auth, $ionicLoading, $ionicModal, $window, pushService) {
+    .run(function ($ionicPlatform, $rootScope, $location, Auth, $ionicLoading) {
 
-    $ionicPlatform.ready(function () {
-         //localstorage check
+    $ionicPlatform.ready(function() {
+        //localstorage check
 
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-         /*Google keys
-          * key: AIzaSyAbXzuAUk1EICCdfpZhoA6-TleQrPWxJuI
-          * Project Number: open-circles-1064/346007849782
-          */
+        /*Google keys
+         * key: AIzaSyAbXzuAUk1EICCdfpZhoA6-TleQrPWxJuI
+         * Project Number: open-circles-1064/346007849782
+         */
         // for form inputs)
         if (window.cordova && window.cordova.plugins.Keyboard) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -55,7 +55,7 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
             }
         });
 
-        
+
         $rootScope.$on("$stateChangeError", function (event, toState, toParams, fromState, fromParams, error) {
             // We can catch the error thrown when the $requireAuth promise is rejected
             // and redirect the user back to the home page
@@ -66,8 +66,9 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
     });
 })
 
-.config(['$stateProvider', '$urlRouterProvider', '$ionicConfigProvider', 
-    function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+    .config(['$stateProvider', '$urlRouterProvider', '$ionicConfigProvider',
+
+function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
     console.log("setting config");
     $ionicConfigProvider.tabs.position('top');
     // Ionic uses AngularUI Router which uses the concept of states
@@ -85,13 +86,14 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
             // controller will not be loaded until $waitForAuth resolves
             // Auth refers to our $firebaseAuth wrapper in the example above
             "currentAuth": ["Auth",
-                function (Auth) {
-                    // $waitForAuth returns a promise so the resolve waits for it to complete
-                    return Auth.$waitForAuth();
-        }]
+
+            function (Auth) {
+                // $waitForAuth returns a promise so the resolve waits for it to complete
+                return Auth.$waitForAuth();
+            }]
         }
     })
-    .state('menu', {
+        .state('menu', {
         url: "/menu",
         abstract: true,
         templateUrl: "templates/menu.html",
@@ -99,11 +101,12 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
             // controller will not be loaded until $requireAuth resolves
             // Auth refers to our $firebaseAuth wrapper in the example above
             "currentAuth": ["Auth",
-                function (Auth) {
-                    // $requireAuth returns a promise so the resolve waits for it to complete
-                    // If the promise is rejected, it will throw a $stateChangeError (see above)
-                    return Auth.$requireAuth();
-      }]
+
+            function (Auth) {
+                // $requireAuth returns a promise so the resolve waits for it to complete
+                // If the promise is rejected, it will throw a $stateChangeError (see above)
+                return Auth.$requireAuth();
+            }]
         }
     })
     // setup an abstract state for the tabs directive
@@ -117,7 +120,7 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
             }
         }
     })
-    .state('menu.tab.ask', {
+        .state('menu.tab.ask', {
         url: '/ask',
         views: {
             'tab-ask': {
@@ -126,7 +129,7 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
             }
         }
     })
-    .state('menu.tab.student', {
+        .state('menu.tab.student', {
         url: '/studentrooms',
         views: {
             'tab-student': {
@@ -135,7 +138,7 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
             }
         }
     })
-     .state('menu.tab.studentc', {
+        .state('menu.tab.studentc', {
         url: '/conversations',
         views: {
             'tab-converse': {
@@ -144,7 +147,7 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
             }
         }
     })
-    .state('menu.tab.settingsMentor', {
+        .state('menu.tab.settingsMentor', {
         url: '/settingsMentor',
         views: {
             'tab-settingsMentor': {
@@ -153,25 +156,25 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
             }
         }
     })
-     .state('menu.tab.chat', {
+        .state('menu.tab.chat', {
         url: '/chat/:advisorID/:schoolID/:advisorKey/:prospectUserID/:prospectQuestionID/:schoolsQuestionID/:question/:displayName/:email/:group/:who',
         views: {
-            'tab-chat':{
+            'tab-chat': {
                 templateUrl: 'templates/tab-chat.html',
-                controller: 'ChatCtrl'  
-            }   
+                controller: 'ChatCtrl'
+            }
         }
     })
-      .state('menu.tab.publicchat', {
+        .state('menu.tab.publicchat', {
         url: '/chat/:prospectUserID/:prospectQuestionID/:schoolsQuestionID/:displayName/:question/:group/:wrap',
         views: {
-            'tab-publicchat':{
+            'tab-publicchat': {
                 templateUrl: 'templates/tab-chat.html',
-                controller: 'PublicChatCtrl'  
-            }   
+                controller: 'PublicChatCtrl'
+            }
         }
     });
-//PublicChatCtrl
+    //PublicChatCtrl
     // if none of the above states are matched, use this as the fallback
     $urlRouterProvider.otherwise('/login');
 

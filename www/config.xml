@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!-- config.xml reference: https://build.phonegap.com/docs/config-xml -->
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id        = "com.theopencircles.com.opencircles"
-        version   = "1.5.8">
+        version   = "1.6.1">
 
     <name>Open Circles</name>
 
@@ -40,8 +39,8 @@
     <preference name="SplashScreen"               value="screen" />
     <preference name="SplashScreenDelay"          value="3000" />
     <preference name="phonegap-version"           value="cli-5.2.0" />
-    <!-- ios 7 overlay not on start up-->
-    <!--<preference name="StatusBarOverlaysWebView" value="true" />-->
+    <!-- ios overlay not on start up-->
+    <!--<preference name="StatusBarOverlaysWebView" value="false" />-->
     <!--
         Define a specific version of PhoneGap to build into your app.
         <preference name="phonegap-version"       value="3.5.0" />
@@ -71,6 +70,7 @@
     <gap:plugin name="org.apache.cordova.splashscreen" source="npm" />
     <gap:plugin name="org.apache.cordova.vibration" source="npm" />
     <gap:plugin name="cordova-plugin-whitelist" source="npm" />
+    <!-- ios plugin to hide or change status bar-->
     <!--<gap:plugin name="cordova-plugin-statusbar" source="npm" />-->
 
     <!-- Third party plugins -->
