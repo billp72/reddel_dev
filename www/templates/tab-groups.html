@@ -1,4 +1,4 @@
-<ion-view view-title="Groups">
+<ion-view view-title="Settings">
     <ion-content class="padding">
       <!--<h4>Join a group</h4>
          <div class="list">
@@ -24,6 +24,18 @@
             <button ng-show="showEditGroup" class="button button-full button-assertive" ng-click="edit(add)">Delete Group</button>
       </div>-->
       <!--end add/edit group-->
+      <h4>Change your password</h4>
+        <div class="list"> 
+            <label class="item item-input">
+                <span class="input-label">Enter Old password</span>
+                <input ng-model="enter.oldPassword" type="text">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Enter New password</span>
+                <input ng-model="enter.newPassword" type="password">
+            </label>
+            <button class="button button-full button-positive" ng-click="runChangePassword(enter)">Send</button>
+        </div>
     </ion-content>
     <ion-footer-bar ui-view="footer">
     <button class="button button-clear button-primary" ng-click="logout()">
@@ -50,14 +62,14 @@
             <a class="content" style="
                 position: absolute;
                 left: 0;
-                top: 69%;
+                top: 64%;
                 height: 100%;
                 width: 100%;
                 text-align: center;
                 margin-top: -20px;
                 color: white;
             ">
-                <i class="ion-ios-arrow-up">?</i>
+                <i class="ion-ios-arrow-up">e</i>
             </a>
          </span>
     </div>

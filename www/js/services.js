@@ -507,9 +507,9 @@ angular.module('mychat.services', ['firebase'])
     var ref = new Firebase(firebaseUrl);
     return {
 
-        change: function (user){
+        change: function (user, schoolemail){
                 ref.changePassword({
-                    email: user.schoolemail,
+                    email: schoolemail,
                     oldPassword: user.oldPassword,
                     newPassword: user.newPassword
                 }, function(error) {

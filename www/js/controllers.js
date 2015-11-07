@@ -237,7 +237,7 @@ angular.module('mychat.controllers', [])
                       
                         $rootScope.schoolID    = val.schoolID;
                         $rootScope.group       = groupID;
-                        $rootScope.email       = val.email;
+                        $rootScope.email       = val.schoolEmail;
                         //$rootScope.groupKey    = !!val.groups ? true : false;
                         $rootScope.userID      = authData.uid;
                         $rootScope.displayName = val.displayName;
@@ -294,10 +294,15 @@ settings for mentor
         $scope.data = { 'list' : '', 'groups' : ''};
         $scope.add.newgroup = !!Users.getIDS('groupName') ? Users.getIDS('groupName') : '';
 
+        $scope.runChangePassword = function(user){
+
+            ChangePassword.change(user, $scope.email);
+        }
         $scope.askQuestion = function(){
 
             $state.go('menu.tab.ask');
         }
+        
         $scope.searchg = function() {
             groupsMentorsDataService.retrieveDataSort($scope.data.groups, function(promise){
                 promise.then(
@@ -486,7 +491,7 @@ settings for mentor
             $scope.IM.textMessage = "";
         }else{//first time an advisor asnwers a question
                if($scope.displayName === displayName){
-                    alert('No need to answer your own question.');
+                    alert('No need to attend your own event.');
 
                     return;
                 }
@@ -732,7 +737,7 @@ settings for mentor
         if(status === 'private' || !status){
             if(!advisorID){
                 if(!prospectUserID){
-                    alert('your question has not been answered yet');
+                    alert('Waiting for a participant ...');
 
                     return;
                 }
@@ -945,7 +950,7 @@ settings for mentor
                                 $scope.schoolID, 
                                 $scope.userID, 
                                 quest.question.value,
-                                'ion-help-circled',
+                                'ion-chatbubble',
                                 false,
                                 false,
                                 false,
@@ -966,7 +971,7 @@ settings for mentor
                             $scope.schoolID, 
                             $scope.userID, 
                             quest.question.value,
-                            'ion-help-circled',
+                            'ion-chatbubble',
                             false,
                             false,
                             false,
