@@ -305,7 +305,7 @@ settings for mentor
             $state.go('menu.tab.ask');
         }
         
-        $scope.searchg = function() {
+        /*$scope.searchg = function() {
             groupsMentorsDataService.retrieveDataSort($scope.data.groups, function(promise){
                 promise.then(
                     function(matches) {
@@ -320,6 +320,14 @@ settings for mentor
                 )
             });
         }
+          $scope.update = function (data){
+            $rootScope.group = {
+                'groupID': data.groupID,
+                'groupName': data.groupName
+            }
+        }
+
+        */
         $scope.create = function(add){
             $scope.allGroups = Users.getAllGroups($scope.userID);
             
@@ -387,12 +395,6 @@ settings for mentor
             $scope.hideNewGroup  = false;
             $scope.modalGrp.hide();
         }*/
-        $scope.update = function (data){
-            $rootScope.group = {
-                'groupID': data.groupID,
-                'groupName': data.groupName
-            }
-        }
         /*$scope.deleteAccount = function(){
                 $ionicModal.fromTemplateUrl('templates/delete-account.html', {
                     scope: $scope
