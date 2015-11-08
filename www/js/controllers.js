@@ -257,8 +257,7 @@ angular.module('mychat.controllers', [])
                         $scope.modal.hide();
                     
                         $state.go('menu.tab.student');
-                    
-                        $ionicLoading.hide();  
+                      
                 });
                 
             }).catch(function (error) {
@@ -418,8 +417,8 @@ settings for mentor
 /*
 * opens the private chat room
 */
-.controller('ChatCtrl', ['$scope', '$rootScope', 'Chats', 'Users', 'Rooms', '$state', '$window', '$ionicLoading', '$ionicModal', '$ionicScrollDelegate', '$timeout', 'RequestsService',
-    function ($scope, $rootScope, Chats, Users, Rooms, $state, $window, $ionicLoading, $ionicModal, $ionicScrollDelegate, $timeout, RequestsService) {
+.controller('ChatCtrl', ['$scope', '$rootScope', 'Chats', 'Users', 'Rooms', '$state', '$window', '$ionicModal', '$ionicScrollDelegate', '$timeout', 'RequestsService',
+    function ($scope, $rootScope, Chats, Users, Rooms, $state, $window, $ionicModal, $ionicScrollDelegate, $timeout, RequestsService) {
     //console.log("Chat Controller initialized");
     var 
         advisorKey          = $state.params.advisorKey,
@@ -475,7 +474,7 @@ settings for mentor
         //console.log('id',advisorID, 'key', advisorKey);
         Chats.selectRoom(schoolID, advisorID, advisorKey);
 
-    Chats.getSelectedRoomName(function(roomName){
+    Chats.getSelectedRoomName(function (roomName){
     // Fetching Chat Records only if a Room is Selected
         if (roomName) {
             $scope.roomName = " - " + roomName;
@@ -487,7 +486,6 @@ settings for mentor
                 }, 0);
         
             },true);
-            
         }
     });
     $scope.sendMessage = function (msg) {
@@ -604,8 +602,8 @@ settings for mentor
 * opens the public chat room
 *
 */
-.controller('PublicChatCtrl', ['$scope', 'PublicChat', 'Users', '$state', '$window', '$ionicLoading', '$ionicModal', '$ionicScrollDelegate', '$timeout', 'RequestsService',
-    function ($scope, PublicChat, Users, $state, $window, $ionicLoading, $ionicModal, $ionicScrollDelegate, $timeout, RequestsService) {
+.controller('PublicChatCtrl', ['$scope', 'PublicChat', 'Users', '$state', '$window', '$ionicModal', '$ionicScrollDelegate', '$timeout', 'RequestsService',
+    function ($scope, PublicChat, Users, $state, $window, $ionicModal, $ionicScrollDelegate, $timeout, RequestsService) {
     //console.log("Chat Controller initialized");
     var 
         prospectUserID      = $state.params.prospectUserID,
@@ -667,7 +665,6 @@ settings for mentor
                 }, 0);
         
             },true);
-            
         }
     });
     $scope.sendMessage = function (msg) {
@@ -725,6 +722,7 @@ settings for mentor
 .controller('AdvisorConversationsCtrl', ['$scope', '$rootScope', 'Users', 'Chats', 'Rooms', '$state', '$window',
     function ($scope, $rootScope, Users, Chats, Rooms, $state, $window) {
     console.log("Student conversations Controller initialized");
+    
     if(!$scope.userID){
         $scope.userID = Users.getIDS('userID');
     }
@@ -734,7 +732,7 @@ settings for mentor
     $scope.school = Users.getUserByID($scope.userID);
     $scope.school.$loaded(function(data){
          $scope.rooms = data;
-         
+
      });
     $scope.askQuestion = function(){
         $state.go('menu.tab.ask');
@@ -808,8 +806,8 @@ settings for mentor
 /*this controller is for public questions
 *
 */
-.controller('AdvisorCtrl', ['$scope', '$rootScope', 'Users', 'Chats', 'Rooms', '$state', '$window', 'groupsMentorData', 'intervalService',
-    function ($scope, $rootScope, Users, Chats, Rooms, $state, $window, groupsMentorData, intervalService) {
+.controller('AdvisorCtrl', ['$scope', '$rootScope', 'Users', 'Chats', 'Rooms', '$state', '$window', 'groupsMentorData', 'intervalService', '$ionicLoading',
+    function ($scope, $rootScope, Users, Chats, Rooms, $state, $window, groupsMentorData, intervalService, $ionicLoading) {
     console.log("Student Controller initialized");
     var stop;
     if(!$scope.schoolID){
@@ -876,6 +874,8 @@ settings for mentor
                 $scope.rooms = data;
         });
         Users.updateUserGroup(val.groupID, val.groupName, $scope.userID);  
+
+        $ionicLoading.hide();
     });
     
     $scope.openChatRoom = function (question, prospectUserID, prospectQuestionID, schoolsQuestionID, displayName, email, status) {
