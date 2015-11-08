@@ -11,6 +11,15 @@
     color: #fafafa;
     margin-top: 10px;
 }*/
+.avatar {
+    float: left;
+    margin-right: 3%;
+}
+.avatar img {
+    -moz-border-radius: 50px;
+    -webkit-border-radius: 50px;
+    border-radius: 50px;
+}
 div.item-select select {
     -moz-appearance: none;
     position: absolute;
@@ -34,7 +43,7 @@ div.item-select {
 }
 .item-note {
     font-size: 10px;
-    margin-top: -22px;
+    margin-top: 0px;
     margin-right: -35px;
 }
 .item-events {

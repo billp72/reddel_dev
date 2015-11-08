@@ -23,7 +23,7 @@ document.addEventListener("deviceready", onDeviceReady, false);
 // 'mychat.controllers' is found in controllers.js
 angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controllers', 'mychat.services', 'mychat.directives', 'mychat.autocomplete', 'mychat.filters'])
 
-    .run(function ($ionicPlatform, $rootScope, $location, Auth, $ionicLoading) {
+    .run(function ($ionicPlatform, $rootScope, $location, Auth, $ionicLoading, $window) {
 
     $ionicPlatform.ready(function() {
         //localstorage check
@@ -52,6 +52,8 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
                 console.log("Logged out");
                 $ionicLoading.hide();
                 $location.path('/login');
+            }else{
+                $location.path('/studentrooms');
             }
         });
 

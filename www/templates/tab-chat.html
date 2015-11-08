@@ -14,7 +14,9 @@
             </ion-item>
             <!--'createdAt':true-->
             <ion-item ng-repeat="chat in chats | orderBy:reverse" type="item-text-wrap">
-                <h4 class="advisors">{{chat.from}} :</h4>
+                <div class="avatar"><img width="50" ng-src="{{chat.avatar}}">
+                    <h4 class="advisors">{{chat.from}}</h4>
+                </div>
                 <span am-time-ago="chat.createdAt" class="item-note">
                 </span>
                 <pre my-links links="chat"></pre>

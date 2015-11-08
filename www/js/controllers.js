@@ -123,6 +123,7 @@ angular.module('mychat.controllers', [])
         if (
             !!user && 
             !!user.schoolemail &&
+            !!user.email &&
             !!user.displayname && 
             !!user.schoolID &&
              user.schoolID.domain === emailDomain(user.schoolemail)[0]
@@ -133,7 +134,7 @@ angular.module('mychat.controllers', [])
                 template: 'Signing Up...'
             });
             auth.$createUser({
-                email: user.schoolemail,
+                email: user.email,
                 password: stripDot.generatePass()
             }).then(function (userData) {
                 alert("User created successfully!");
@@ -233,16 +234,17 @@ angular.module('mychat.controllers', [])
                 
                     ref.child("users").child(authData.uid+'/user').once('value', function (snapshot) {
                         var val = snapshot.val();
+                        //get and store gavitar image inside authData  - https://en.gravatar.com/
                         var groupID    = !!val.groupID ? {'groupID':val.groupID, 'groupName':val.groupName} : {'groupID': 'gen', 'groupName':'General'};
-                      
+                        $rootScope.email       = val.schoolEmail;
                         $rootScope.schoolID    = val.schoolID;
                         $rootScope.group       = groupID;
-                        $rootScope.email       = val.schoolEmail;
                         //$rootScope.groupKey    = !!val.groups ? true : false;
                         $rootScope.userID      = authData.uid;
                         $rootScope.displayName = val.displayName;
                        
                     //persist data
+                        Users.storeIDS(authData.password.profileImageURL, 'avatar');
                         Users.storeIDS(val.schoolID, 'schoolID');
                         Users.storeIDS(groupID, 'groupID');
                         Users.storeIDS(authData.uid, 'userID');
@@ -280,8 +282,8 @@ angular.module('mychat.controllers', [])
 /*
 settings for mentor
 */
-.controller('SettingsCtrlMentor', ['$scope', '$rootScope','Users', 'ChangePassword', '$state', '$ionicLoading', '$ionicModal', 'Auth', 'groupsMentorsDataService',
-    function ($scope, $rootScope, Users, ChangePassword, $state, $ionicLoading, $ionicModal, Auth, groupsMentorsDataService) {
+.controller('SettingsCtrlMentor', ['$scope', '$rootScope','Users', 'ChangePassword', '$state', '$ionicLoading', '$ionicModal', 'Auth', 'groupsMentorsDataService', 'intervalService',
+    function ($scope, $rootScope, Users, ChangePassword, $state, $ionicLoading, $ionicModal, Auth, groupsMentorsDataService, intervalService) {
         console.log('settings mentor initialized');
      
         /*part of add/edit group
@@ -405,6 +407,7 @@ settings for mentor
                 template: 'Logging Out...'
             });
             Auth.$unauth();
+            intervalService.stopFlight();
         }
        
   
@@ -487,7 +490,7 @@ settings for mentor
     });
     $scope.sendMessage = function (msg) {
         if(!firstMessage){
-            Chats.send($scope.displayName, schoolID, msg, toggleUserID, toggleQuestionID);
+            Chats.send($scope.displayName, schoolID, msg, toggleUserID, toggleQuestionID, Users.getIDS('avatar'));
             $scope.IM.textMessage = "";
         }else{//first time an advisor asnwers a question
                if($scope.displayName === displayName){
@@ -516,7 +519,8 @@ settings for mentor
                         schoolID,
                         msg,
                         $scope.advisorKey,
-                        advisorID
+                        advisorID,
+                        Users.getIDS('avatar')
                     )               
                 })
                 .then(function (results){
@@ -666,7 +670,7 @@ settings for mentor
     });
     $scope.sendMessage = function (msg) {
         if(!firstMessage){
-            PublicChat.send($scope.displayName, $scope.schoolID, msg, toggleQuestionID, toggleUserID);
+            PublicChat.send($scope.displayName, $scope.schoolID, msg, toggleQuestionID, toggleUserID, Users.getIDS('avatar'));
             $scope.IM.textMessage = "";
         }else{
 
@@ -802,10 +806,10 @@ settings for mentor
 /*this controller is for public questions
 *
 */
-.controller('AdvisorCtrl', ['$scope', '$rootScope', 'Users', 'Chats', 'Rooms', '$state', '$window', 'groupsMentorData',
-    function ($scope, $rootScope, Users, Chats, Rooms, $state, $window, groupsMentorData) {
+.controller('AdvisorCtrl', ['$scope', '$rootScope', 'Users', 'Chats', 'Rooms', '$state', '$window', 'groupsMentorData', 'intervalService',
+    function ($scope, $rootScope, Users, Chats, Rooms, $state, $window, groupsMentorData, intervalService) {
     console.log("Student Controller initialized");
-    
+    var stop;
     if(!$scope.schoolID){
         $scope.schoolID = Users.getIDS('schoolID');
     }
@@ -822,13 +826,30 @@ settings for mentor
     $scope.data = {'list': ''};
 
     groupsMentorData.getGroupByID($scope.schoolID, function (matches){
-        $scope.user.group = matches[0];
-        $scope.data.list = matches;
+                $scope.user.group = matches[0];
+                $scope.data.list = matches;
 
-        $scope.group = {
-                'groupID': matches[0].groupID,
-                'groupName': matches[0].groupName
-        }
+                $scope.group = {
+                    'groupID': matches[0].groupID,
+                    'groupName': matches[0].groupName
+                }
+    });
+
+    intervalService.startFlight(function (){     
+            groupsMentorData.getGroupByID($scope.schoolID, function (matches){
+                $scope.user.group = matches[0];
+                $scope.data.list = matches;
+
+                $scope.group = {
+                    'groupID': matches[0].groupID,
+                    'groupName': matches[0].groupName
+                }
+            });
+    }, 3600000000);
+
+    $scope.$on('$destroy', function() {
+          // Make sure that the interval is destroyed too
+          intervalService.stopFlight();
     });
 
     $scope.update = function (data){

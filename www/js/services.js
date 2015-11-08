@@ -68,7 +68,7 @@ angular.module('mychat.services', ['firebase'])
                 chats = null;
             }
         },
-        send: function (from, schoolID, message, toggleUserID, toggleQuestionID) {
+        send: function (from, schoolID, message, toggleUserID, toggleQuestionID, avatar) {
             //console.log("sending message from :" + from.displayName + " & message is " + message);
             
             if (from && message) {
@@ -76,7 +76,8 @@ angular.module('mychat.services', ['firebase'])
                     from: from,
                     message: message,
                     schoolID: schoolID,
-                    createdAt: Firebase.ServerValue.TIMESTAMP
+                    createdAt: Firebase.ServerValue.TIMESTAMP,
+                    avatar: avatar
                 };
                  chats.$add(chatMessage).then(function (data) {
                     ref.child(toggleUserID).child('questions').child(toggleQuestionID)
@@ -186,7 +187,7 @@ angular.module('mychat.services', ['firebase'])
             selectedRoomID = schoolID;
             chats = $firebase(ref.child(schoolID).child('questions').child(groupID).child(questionID).child('conversations')).$asArray();  
         },
-       send: function (from, schoolID, message, toggleUserID, toggleQuestionID) {
+       send: function (from, schoolID, message, toggleUserID, toggleQuestionID, avatar) {
             //console.log("sending message from :" + from.displayName + " & message is " + message);
             
             if (from && message) {
@@ -194,7 +195,8 @@ angular.module('mychat.services', ['firebase'])
                     from: from,
                     message: message,
                     schoolID: schoolID,
-                    createdAt: Firebase.ServerValue.TIMESTAMP
+                    createdAt: Firebase.ServerValue.TIMESTAMP,
+                    avatar: avatar
                 };
                 chats.$add(chatMessage).then(function (data) {
                     /*Users.getRef().child(toggleUserID).child('questions').child(toggleQuestionID)
@@ -359,13 +361,14 @@ angular.module('mychat.services', ['firebase'])
         removeItem: function (key){
             $window.localStorage.removeItem(key);
         },
-        addAnswerToAdvisor: function (from, schoolID, message, questionsID, userID){
+        addAnswerToAdvisor: function (from, schoolID, message, questionsID, userID, avatar){
             var user = this.getUserConversation(userID, questionsID);
             var chatMessage = {
                     from: from,
                     message: message,
                     schoolID: schoolID,
-                    createdAt: Firebase.ServerValue.TIMESTAMP
+                    createdAt: Firebase.ServerValue.TIMESTAMP,
+                    avatar: avatar
                 };
             return user.$add(chatMessage);
        },
@@ -477,7 +480,25 @@ angular.module('mychat.services', ['firebase'])
        }
     }
 }])
+.factory('intervalService', ['$interval', function ($interval){
+        var _this = this;
+        return {
+            startFlight: function (cb, time){
 
+                if (angular.isDefined(_this.stop)) return;
+
+                _this.stop = $interval(cb, time);
+            },
+            stopFlight: function (){
+
+                if (angular.isDefined(_this.stop)) {
+
+                    $interval.cancel(_this.stop);
+                    _this.stop = undefined;
+                }
+            }
+        }
+}])
 .factory('stripDot', [function(){
 
     return {
