@@ -480,25 +480,7 @@ angular.module('mychat.services', ['firebase'])
        }
     }
 }])
-.factory('intervalService', ['$interval', function ($interval){
-        var _this = this;
-        return {
-            startFlight: function (cb, time){
 
-                if (angular.isDefined(_this.stop)) return;
-
-                _this.stop = $interval(cb, time);
-            },
-            stopFlight: function (){
-
-                if (angular.isDefined(_this.stop)) {
-
-                    $interval.cancel(_this.stop);
-                    _this.stop = undefined;
-                }
-            }
-        }
-}])
 .factory('stripDot', [function(){
 
     return {

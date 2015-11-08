@@ -141,7 +141,6 @@ angular.module('mychat.controllers', [])
                 ref.child("users").child(userData.uid).set({
                     user:{
                         displayName: user.displayname +'-'+ stripDot.shortRandom(),
-                        grade: user.grade,
                         schoolID: stripDot.strip(user.schoolID.domain),
                         schoolEmail: user.schoolemail,
                         email: user.email
@@ -235,18 +234,19 @@ angular.module('mychat.controllers', [])
                     ref.child("users").child(authData.uid+'/user').once('value', function (snapshot) {
                         var val = snapshot.val();
                         //get and store gavitar image inside authData  - https://en.gravatar.com/
-                        var groupID    = !!val.groupID ? {'groupID':val.groupID, 'groupName':val.groupName} : {'groupID': 'gen', 'groupName':'General'};
+                        var group              = !!val.groupID ? {'groupID':val.groupID, 'groupName':val.groupName} : {'groupID': 'gen', 'groupName':'General'};
                         $rootScope.email       = val.schoolEmail;
                         $rootScope.schoolID    = val.schoolID;
-                        $rootScope.group       = groupID;
+                        $rootScope.group       = group;
                         //$rootScope.groupKey    = !!val.groups ? true : false;
                         $rootScope.userID      = authData.uid;
                         $rootScope.displayName = val.displayName;
+                        $rootScope.superuser   = !!val.superuser ? val.superuser : null;
                        
                     //persist data
                         Users.storeIDS(authData.password.profileImageURL, 'avatar');
                         Users.storeIDS(val.schoolID, 'schoolID');
-                        Users.storeIDS(groupID, 'groupID');
+                        Users.storeIDS(group, 'group');
                         Users.storeIDS(authData.uid, 'userID');
                         Users.storeIDS(val.displayName, 'displayName');
 
@@ -281,8 +281,8 @@ angular.module('mychat.controllers', [])
 /*
 settings for mentor
 */
-.controller('SettingsCtrlMentor', ['$scope', '$rootScope','Users', 'ChangePassword', '$state', '$ionicLoading', '$ionicModal', 'Auth', 'groupsMentorsDataService', 'intervalService',
-    function ($scope, $rootScope, Users, ChangePassword, $state, $ionicLoading, $ionicModal, Auth, groupsMentorsDataService, intervalService) {
+.controller('SettingsCtrlMentor', ['$scope', '$rootScope','Users', 'ChangePassword', '$state', '$ionicLoading', '$ionicModal', 'Auth', 'groupsMentorsDataService',
+    function ($scope, $rootScope, Users, ChangePassword, $state, $ionicLoading, $ionicModal, Auth, groupsMentorsDataService) {
         console.log('settings mentor initialized');
      
         /*part of add/edit group
@@ -408,7 +408,6 @@ settings for mentor
                 template: 'Logging Out...'
             });
             Auth.$unauth();
-            intervalService.stopFlight();
         }
        
   
@@ -806,8 +805,8 @@ settings for mentor
 /*this controller is for public questions
 *
 */
-.controller('AdvisorCtrl', ['$scope', '$rootScope', 'Users', 'Chats', 'Rooms', '$state', '$window', 'groupsMentorData', 'intervalService', '$ionicLoading',
-    function ($scope, $rootScope, Users, Chats, Rooms, $state, $window, groupsMentorData, intervalService, $ionicLoading) {
+.controller('AdvisorCtrl', ['$scope', '$rootScope', 'Users', 'Chats', 'Rooms', '$state', '$window', 'groupsMentorData', '$ionicLoading',
+    function ($scope, $rootScope, Users, Chats, Rooms, $state, $window, groupsMentorData, $ionicLoading) {
     console.log("Student Controller initialized");
     var stop;
     if(!$scope.schoolID){
@@ -816,40 +815,21 @@ settings for mentor
     if(!$scope.userID){
         $scope.userID = Users.getIDS('userID');
     }
-    if(!$scope.group){
-        $scope.groupID = Users.getIDS('groupID').groupID;
-    }
+   
     $scope.askQuestion = function(){
         $state.go('menu.tab.ask');
     }
     $scope.user = {}
     $scope.data = {'list': ''};
-
-    groupsMentorData.getGroupByID($scope.schoolID, function (matches){
-                $scope.user.group = matches[0];
-                $scope.data.list = matches;
-
-                $scope.group = {
-                    'groupID': matches[0].groupID,
-                    'groupName': matches[0].groupName
-                }
-    });
-
-    intervalService.startFlight(function (){     
+    $scope.$watch('tabs', function(old, newv){
+        if(newv === 'events' || old === 'events'){
             groupsMentorData.getGroupByID($scope.schoolID, function (matches){
-                $scope.user.group = matches[0];
+                matches.push({'groupID': 'sel', 'groupName':'Groups Updated'});
+                $scope.user.group = matches[matches.length-1];
                 $scope.data.list = matches;
 
-                $scope.group = {
-                    'groupID': matches[0].groupID,
-                    'groupName': matches[0].groupName
-                }
             });
-    }, 3600000000);
-
-    $scope.$on('$destroy', function() {
-          // Make sure that the interval is destroyed too
-          intervalService.stopFlight();
+        }
     });
 
     $scope.update = function (data){
@@ -867,9 +847,9 @@ settings for mentor
         }
 
         $scope.groupID = val.groupID;
-        $scope.title1 = val.groupName;
+        $scope.title1  = val.groupName;
 
-        $scope.school = Rooms.getSchoolBySchoolID($scope.schoolID, val.groupID);
+        $scope.school = Rooms.getSchoolBySchoolID($scope.schoolID, $scope.groupID);
             $scope.school.$loaded(function(data){
                 $scope.rooms = data;
         });
@@ -925,7 +905,7 @@ settings for mentor
     if(!$scope.displayName){
         $scope.displayName = Users.getIDS('displayName');
     }
-
+    $scope.sudo = !$scope.superuser ? false : true;
     $scope.user = {}
     $scope.data = { 'listg' : '', 'search' : '', 'groups': ''};
 
@@ -947,9 +927,9 @@ settings for mentor
                 alert('please select a group');
                 return;
           } 
-          
-          //status = !quest.ischecked ? 'private' : 'public';
-          status = 'private';
+    
+          status = !!quest.ischecked ? 'public' : 'private';
+
           grpID = quest.group.groupID;
           grpName = quest.group.groupName;
                 if(quest.question.amount >= 15){

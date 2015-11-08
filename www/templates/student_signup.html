@@ -1,6 +1,6 @@
 <ion-modal-view>
     <ion-header-bar class="bar bar-header bar-positive">
-        <h1 class="title">Create a Mentor's Account</h1>
+        <h1 class="title">Create Account</h1>
         <button class="button button-clear button-primary" ng-click="modal1.hide()">Cancel</button>
     </ion-header-bar>
     <ion-content class="padding">
@@ -27,17 +27,6 @@
             <label class="item item-input">
                 <span class="input-label">Display Name</span>
                 <input ng-model="user.displayname" type="text">
-            </label>
-            <label class="item item-input item-select">
-                <div class="input-label">
-                    Select Grade-level
-                </div>
-                <select ng-model="user.grade">
-                    <option value="freshmen">Freshmen</option>
-                    <option value="sophmore">Sophomore</option>
-                    <option value="junior">Junior</option>
-                    <option value="senior">Senior</option>
-                </select>
             </label>
             <button class="button button-full button-positive" ng-click="createStudent(user)">Create</button>
         </div>

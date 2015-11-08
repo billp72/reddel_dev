@@ -19,9 +19,9 @@
             <label class="item item-input">
                 <textarea my-maxlength="100" row="0" name="comment" id="comment-textarea" class="no-resize" ng-model="user.question" placeHolder="Describe Event - min of 15 characters max 100 ..."></textarea>
             </label>
-            <!--<label>
+            <label ng-show="sudo">
                 <ion-checkbox ng-model="user.ischecked">check to make question public</ion-checkbox>
-            </label>-->
+            </label>
         </div>
         <button ng-disabled="disable" class="button button-full button-positive" ng-click="ask(user)">Add Event</button>
     </ion-content>
