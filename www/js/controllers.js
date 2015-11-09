@@ -824,7 +824,7 @@ settings for mentor
     $scope.$watch('tabs', function(old, newv){
         if(newv === 'events' || old === 'events'){
             groupsMentorData.getGroupByID($scope.schoolID, function (matches){
-                matches.push({'groupID': 'sel', 'groupName':'Groups Updated'});
+                matches.push({'groupID': 'sel', 'groupName':'Select Group'});
                 $scope.user.group = matches[matches.length-1];
                 $scope.data.list = matches;
 
