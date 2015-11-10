@@ -228,14 +228,16 @@ angular.module('mychat.controllers', [])
         
             if (user && user.email && user.pwdForLogin) {
 
+                $ionicLoading.show({
+                    template: 'Signing In...'
+                });
+
                 ConnectionCheck.netCallback(function(bool){
                     if(!bool){
                         alert('Your connection is weak or not avaiable');
+                        $ionicLoading.hide();
                     }else{
 
-                    $ionicLoading.show({
-                        template: 'Signing In...'
-                    });
                     auth.$authWithPassword({
                         email: user.email,
                         password: user.pwdForLogin
