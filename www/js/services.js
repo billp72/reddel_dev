@@ -707,8 +707,8 @@ angular.module('mychat.services', ['firebase'])
             if(states[networkState] == 'No network connection'){
                 if(!timeOutOccured){
                     $timeout.cancel(timeOutInteger);
-                    cb(false);
                 }
+                 cb(false);
             }else{
                 var url = "http://theopencircles.com/opencircles/loadImage.jpg";
  
@@ -723,17 +723,16 @@ angular.module('mychat.services', ['firebase'])
                         success(function(response){
 
                                if(!timeOutOccured){
-                                    $timeout.cancel(timeOutInteger);
-                                    cb(true);
-                                    
+                                    $timeout.cancel(timeOutInteger); 
                                 }
+                                cb(true); 
                             }).
                             error(function(xhr, textStatus, errorThrown) {
                             
                                     if(!timeOutOccured){
                                         $timeout.cancel(timeOutInteger);
-                                        cb(false);
                                     }
+                                    cb(false);
                             });
                         
             }

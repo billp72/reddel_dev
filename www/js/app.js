@@ -11,9 +11,6 @@ function onDeviceReady() {
 
     angular.bootstrap(document, ["mychat"]);
 
-    /*if(ionic.Platform.isIOS()){
-        StatusBar.overlaysWebView(false);
-    }*/
 }
 //console.log("binding device ready");
 // Registering onDeviceReady callback with deviceready event
