@@ -15,6 +15,7 @@ angular.module('mychat.controllers', [])
     'pushService',
     '$window',
     '$timeout',
+    'ConnectionCheck',
     function (
     $scope, 
     $ionicModal, 
@@ -29,7 +30,8 @@ angular.module('mychat.controllers', [])
     stripDot,
     pushService,
     $window,
-    $timeout) {
+    $timeout,
+    ConnectionCheck) {
     //console.log('Login Controller Initialized');
 
     var ref = new Firebase($scope.firebaseUrl);
@@ -123,7 +125,6 @@ angular.module('mychat.controllers', [])
         if (
             !!user && 
             !!user.schoolemail &&
-            !!user.email &&
             !!user.displayname && 
             !!user.schoolID &&
              user.schoolID.domain === emailDomain(user.schoolemail)[0]
@@ -134,7 +135,7 @@ angular.module('mychat.controllers', [])
                 template: 'Signing Up...'
             });
             auth.$createUser({
-                email: user.email,
+                email: user.schoolemail,
                 password: stripDot.generatePass()
             }).then(function (userData) {
                 alert("User created successfully!");
@@ -142,8 +143,7 @@ angular.module('mychat.controllers', [])
                     user:{
                         displayName: user.displayname +'-'+ stripDot.shortRandom(),
                         schoolID: stripDot.strip(user.schoolID.domain),
-                        schoolEmail: user.schoolemail,
-                        email: user.email
+                        schoolEmail: user.schoolemail
                     }
                 });
                 $ionicLoading.hide();
@@ -214,60 +214,73 @@ angular.module('mychat.controllers', [])
                 });
     }
     $scope.signIn = function (user) {
+
         $window.localStorage.setItem('test', 'test');
-        if($window.localStorage.getItem('test') === null){
-             alert('You must activate local storage on your device to use this app');
-            $scope.modal.hide();           
-        }else{
+
+            if($window.localStorage.getItem('test') === null){
+                alert('You must activate local storage on your device to use this app');
+                $scope.modal.hide(); 
+
+                return; 
+            }         
+       
             $window.localStorage.removeItem('test');
         
             if (user && user.email && user.pwdForLogin) {
 
-                $ionicLoading.show({
-                    template: 'Signing In...'
-                });
-                auth.$authWithPassword({
-                    email: user.email,
-                    password: user.pwdForLogin
-                }).then(function (authData) {
+                ConnectionCheck.netCallback(function(bool){
+                    if(!bool){
+                        alert('Your connection is weak or not avaiable');
+                    }else{
+
+                    $ionicLoading.show({
+                        template: 'Signing In...'
+                    });
+                    auth.$authWithPassword({
+                        email: user.email,
+                        password: user.pwdForLogin
+                    }).then(function (authData) {
                 
-                    ref.child("users").child(authData.uid+'/user').once('value', function (snapshot) {
-                        var val = snapshot.val();
-                        //get and store gavitar image inside authData  - https://en.gravatar.com/
-                        var group              = !!val.groupID ? {'groupID':val.groupID, 'groupName':val.groupName} : {'groupID': 'gen', 'groupName':'General'};
-                        $rootScope.email       = val.schoolEmail;
-                        $rootScope.schoolID    = val.schoolID;
-                        $rootScope.group       = group;
-                        //$rootScope.groupKey    = !!val.groups ? true : false;
-                        $rootScope.userID      = authData.uid;
-                        $rootScope.displayName = val.displayName;
-                        $rootScope.superuser   = !!val.superuser ? val.superuser : null;
+                        ref.child("users").child(authData.uid+'/user').once('value', function (snapshot) {
+                            var val = snapshot.val();
+                            //get and store gavitar image inside authData  - https://en.gravatar.com/
+                            var group              = !!val.groupID ? {'groupID':val.groupID, 'groupName':val.groupName} : {'groupID': 'gen', 'groupName':'General'};
+                            $rootScope.email       = val.schoolEmail;
+                            $rootScope.schoolID    = val.schoolID;
+                            $rootScope.group       = group;
+                            //$rootScope.groupKey    = !!val.groups ? true : false;
+                            $rootScope.userID      = authData.uid;
+                            $rootScope.displayName = val.displayName;
+                            $rootScope.superuser   = !!val.superuser ? val.superuser : null;
                        
-                    //persist data
-                        Users.storeIDS(authData.password.profileImageURL, 'avatar');
-                        Users.storeIDS(val.schoolID, 'schoolID');
-                        Users.storeIDS(group, 'group');
-                        Users.storeIDS(authData.uid, 'userID');
-                        Users.storeIDS(val.displayName, 'displayName');
+                        //persist data
+                            Users.storeIDS(authData.password.profileImageURL, 'avatar');
+                            Users.storeIDS(val.schoolID, 'schoolID');
+                            Users.storeIDS(group, 'group');
+                            Users.storeIDS(authData.uid, 'userID');
+                            Users.storeIDS(val.displayName, 'displayName');
 
-                        pushService.register().then(function(token){
-                            console.log("token: ", token);
-                        });
+                            pushService.register().then(function(token){
+                                console.log("token: ", token);
+                            });
 
-                        $scope.modal.hide();
+                            $scope.modal.hide();
                     
-                        $state.go('menu.tab.student');
+                            $state.go('menu.tab.student');
                       
-                });
+                    });
                 
-            }).catch(function (error) {
-                alert("Authentication failed:" + error.message);
-                $ionicLoading.hide();
-            });
+                }).catch(function (error) {
+                    alert("Authentication failed:" + error.message);
+                    $ionicLoading.hide();
+                });
+            }
+         });
+
         } else{
             alert("Please enter email and password both");
         }
-      }
+
     }   
 }])
 /*

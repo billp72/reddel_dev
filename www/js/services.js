@@ -679,8 +679,72 @@ angular.module('mychat.services', ['firebase'])
         }
     }
 }])
-
+.service('ConnectionCheck', ['$http', '$q', '$timeout', ConnectionCheck])
 .service('RequestsService', ['$http', '$q', '$ionicLoading',  RequestsService]);
+
+    function ConnectionCheck ($http, $q, $timeout){
+
+       var timeOutInteger = null;
+       var timeOutOccured = false;
+
+       var net_callback = function (cb){
+
+            timeOutInteger = $timeout(function () {
+                timeOutOccured = true;
+            }, 20 * 1000 );
+
+            var networkState = navigator.connection.type;
+ 
+            var states = {};
+            states[Connection.UNKNOWN]  = 'Unknown connection';
+            states[Connection.ETHERNET] = 'Ethernet connection';
+            states[Connection.WIFI]     = 'WiFi connection';
+            states[Connection.CELL_2G]  = 'Cell 2G connection';
+            states[Connection.CELL_3G]  = 'Cell 3G connection';
+            states[Connection.CELL_4G]  = 'Cell 4G connection';
+            states[Connection.NONE]     = 'No network connection';
+
+            if(states[networkState] == 'No network connection'){
+                if(!timeOutOccured){
+                    $timeout.cancel(timeOutInteger);
+                    cb(false);
+                }
+            }else{
+                var url = "http://theopencircles.com/opencircles/loadImage.jpg";
+ 
+                $http(
+                        { 
+                            type: "GET",
+                            data: "{}",
+                            url: url,
+                            cache: false,
+                            timeout: 20 * 1000
+                        }).
+                        success(function(response){
+
+                               if(!timeOutOccured){
+                                    $timeout.cancel(timeOutInteger);
+                                    cb(true);
+                                    
+                                }
+                            }).
+                            error(function(xhr, textStatus, errorThrown) {
+                            
+                                    if(!timeOutOccured){
+                                        $timeout.cancel(timeOutInteger);
+                                        cb(false);
+                                    }
+                            });
+                        
+            }
+
+        }
+
+
+        return {
+            netCallback: net_callback
+        }
+    }
 
     function RequestsService($http, $q, $ionicLoading){
 
