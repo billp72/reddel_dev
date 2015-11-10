@@ -156,7 +156,7 @@ function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
         }
     })
         .state('menu.tab.chat', {
-        url: '/chat/:advisorID/:schoolID/:advisorKey/:prospectUserID/:prospectQuestionID/:schoolsQuestionID/:question/:displayName/:email/:group/:who',
+        url: '/chat/:advisorID/:schoolID/:advisorKey/:prospectUserID/:prospectQuestionID/:schoolsQuestionID/:question/:displayName/:email/:group/:who/:avatar',
         views: {
             'tab-chat': {
                 templateUrl: 'templates/tab-chat.html',
@@ -165,7 +165,7 @@ function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
         }
     })
         .state('menu.tab.publicchat', {
-        url: '/chat/:prospectUserID/:prospectQuestionID/:schoolsQuestionID/:displayName/:question/:group/:wrap',
+        url: '/chat/:prospectUserID/:prospectQuestionID/:schoolsQuestionID/:displayName/:question/:group/:wrap/:avatar',
         views: {
             'tab-publicchat': {
                 templateUrl: 'templates/tab-chat.html',

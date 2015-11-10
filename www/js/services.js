@@ -263,7 +263,7 @@ angular.module('mychat.services', ['firebase'])
         checkSchoolExist: function(schoolID){
             return $firebase(ref.child(schoolID).child('questions')).$asArray();
         },
-        addQuestionsToSchool: function(schoolID, userID, question, icon, questionID, displayName, email, groupID, groupName, status){
+        addQuestionsToSchool: function(schoolID, userID, question, icon, questionID, displayName, email, groupID, groupName, status, avatar){
             var qdata = {
                 schoolID: schoolID,
                 userID: userID,
@@ -274,6 +274,7 @@ angular.module('mychat.services', ['firebase'])
                 email: email,
                 groupID: groupID,
                 status: status,
+                avatar: avatar,
                 createdAt: Firebase.ServerValue.TIMESTAMP
             }
         
@@ -300,7 +301,7 @@ angular.module('mychat.services', ['firebase'])
         getUserByID: function(studentID){
              return $firebase(ref.child(studentID).child('questions')).$asArray();
         },
-        addQuestionToUser: function(schoolID, ID, question, icon, questionID, prospectUserID, displayName, email, groupName, status, groupID, publicQuestionKey){
+        addQuestionToUser: function(schoolID, ID, question, icon, questionID, prospectUserID, displayName, email, groupName, status, groupID, publicQuestionKey, avatar){
             var user = this.getUserByID(ID);
             if(!!questionID){
                 return user.$add(
@@ -312,7 +313,8 @@ angular.module('mychat.services', ['firebase'])
                         displayName: displayName,
                         email: email, 
                         icon: icon,
-                        status: 'private'
+                        status: 'private',
+                        avatar: avatar
                     });
             }else{
                 return user.$add(
@@ -323,7 +325,8 @@ angular.module('mychat.services', ['firebase'])
                         groupName: groupName,
                         status: status,
                         groupID: groupID,
-                        publicQuestionKey: publicQuestionKey
+                        publicQuestionKey: publicQuestionKey,
+                        avatar: avatar
                     });
             }
         },
