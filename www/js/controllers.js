@@ -14,7 +14,6 @@ angular.module('mychat.controllers', [])
     'stripDot',
     'pushService',
     '$window',
-    '$timeout',
     'ConnectionCheck',
     function (
     $scope, 
@@ -30,7 +29,6 @@ angular.module('mychat.controllers', [])
     stripDot,
     pushService,
     $window,
-    $timeout,
     ConnectionCheck) {
     //console.log('Login Controller Initialized');
 
@@ -127,72 +125,84 @@ angular.module('mychat.controllers', [])
             !!user.schoolemail &&
             !!user.displayname && 
             !!user.schoolID &&
-             user.schoolID.domain === emailDomain(user.schoolemail)[0]
+            user.schoolID.domain === emailDomain(user.schoolemail)[0]
              ) 
         {
-
+        
            $ionicLoading.show({
                 template: 'Signing Up...'
             });
-            auth.$createUser({
-                email: user.schoolemail,
-                password: stripDot.generatePass()
-            }).then(function (userData) {
-                alert("User created successfully!");
-                ref.child("users").child(userData.uid).set({
-                    user:{
-                        displayName: user.displayname +'-'+ stripDot.shortRandom(),
-                        schoolID: stripDot.strip(user.schoolID.domain),
-                        schoolEmail: user.schoolemail
-                    }
-                });
-                $ionicLoading.hide();
-                $scope.modal1.hide();
-                $scope.modal1.remove();
-            }).then(function(userData){
 
-                var school = Rooms.checkSchoolExist(stripDot.strip(user.schoolID.domain));
-                school.$loaded(function(data){
+             
+            ConnectionCheck.netCallback(function(bool){
+                if(!bool){
+                    alert('Your connection is weak or not avaiable');
+                    $ionicLoading.hide();
+                }else{
+          
+                auth.$createUser({
+                    email: user.schoolemail,
+                    password: stripDot.generatePass()
+                }).then(function (userData) {
+                    alert("User created successfully!");
+                    ref.child("users").child(userData.uid).set({
+                        user:{
+                            displayName: user.displayname +'-'+ stripDot.shortRandom(),
+                            schoolID: stripDot.strip(user.schoolID.domain),
+                            schoolEmail: user.schoolemail
+                        }
+                    });
+                    $ionicLoading.hide();
+                    $scope.modal1.hide();
+                    $scope.modal1.remove();
+                }).then(function(userData){
+
+                    var school = Rooms.checkSchoolExist(stripDot.strip(user.schoolID.domain));
+                    school.$loaded(function(data){
 
                         //if the school doesn't exist already, add it
-                    if(data.length <= 0){
-                        var room = ref.child("schools").child(stripDot.strip(user.schoolID.domain));
-                        room.set({
-                            icon: "ion-university",
-                            schoolname: user.schoolID.value,
-                            schoolID: stripDot.strip(user.schoolID.domain),
-                            schoolEmail: user.schoolID.schoolContact,
-                            category: user.schoolID.category,
-                            ID: room.key()
-                        },function(err){
-                            if(err) throw err;
+                        if(data.length <= 0){
+                            var room = ref.child("schools").child(stripDot.strip(user.schoolID.domain));
+                            room.set({
+                                icon: "ion-university",
+                                schoolname: user.schoolID.value,
+                                schoolID: stripDot.strip(user.schoolID.domain),
+                                schoolEmail: user.schoolID.schoolContact,
+                                category: user.schoolID.category,
+                                ID: room.key()
+                            },function(err){
+                                if(err) throw err;
 
-                        })
-                    }
-                });
-            }).then(function(){
-                ref.resetPassword({
-                    email: user.schoolemail
-                }, function(error) {
-                    if (error) {
-                        switch (error.code) {
-                            case "INVALID_USER":
-                                alert("The specified user account does not exist.");
-                                break;
-                            default:
-                                alert("Error:" + error);
+                            })
                         }
-                    } else {
-                        alert("An email to your student account has been sent!");
-                        $ionicLoading.hide();
-                        $state.go('login');
-                    }
+                    });
+                }).then(function(){
+                    ref.resetPassword({
+                        email: user.schoolemail
+                    }, function(error) {
+                        if (error) {
+                            switch (error.code) {
+                                case "INVALID_USER":
+                                    alert("The specified user account does not exist.");
+                                    break;
+                                default:
+                                    alert("Error:" + error);
+                            }
+                        } else {
+                            alert("An email to your student account has been sent!");
+                            $ionicLoading.hide();
+                            $state.go('login');
+                        }
+                    });
+                })  
+                .catch(function (error) {
+                    alert("Error: " + error);
+                    $ionicLoading.hide();
                 });
-              })  
-            .catch(function (error) {
-                alert("Error: " + error);
-                $ionicLoading.hide();
-            });
+            
+                }
+            })
+            
         }else{
             alert("Please fill all details properly");
         }
@@ -431,8 +441,8 @@ settings for mentor
 /*
 * opens the private chat room
 */
-.controller('ChatCtrl', ['$scope', '$rootScope', 'Chats', 'Users', 'Rooms', '$state', '$window', '$ionicModal', '$ionicScrollDelegate', '$timeout', 'RequestsService',
-    function ($scope, $rootScope, Chats, Users, Rooms, $state, $window, $ionicModal, $ionicScrollDelegate, $timeout, RequestsService) {
+.controller('ChatCtrl', ['$scope', 'Chats', 'Users', 'Rooms', '$state', '$window', '$ionicModal', '$ionicScrollDelegate', '$timeout', 'RequestsService',
+    function ($scope, Chats, Users, Rooms, $state, $window, $ionicModal, $ionicScrollDelegate, $timeout, RequestsService) {
     //console.log("Chat Controller initialized");
     var 
         advisorKey          = $state.params.advisorKey,
@@ -734,8 +744,8 @@ settings for mentor
 /*the advisor see private questions and open chat
 *
 */
-.controller('AdvisorConversationsCtrl', ['$scope', '$rootScope', 'Users', 'Chats', 'Rooms', '$state', '$window',
-    function ($scope, $rootScope, Users, Chats, Rooms, $state, $window) {
+.controller('AdvisorConversationsCtrl', ['$scope', 'Users', 'Chats', 'Rooms', '$state', '$window',
+    function ($scope, Users, Chats, Rooms, $state, $window) {
     console.log("Student conversations Controller initialized");
     
     if(!$scope.userID){
@@ -824,8 +834,8 @@ settings for mentor
 /*this controller is for public questions
 *
 */
-.controller('AdvisorCtrl', ['$scope', '$rootScope', 'Users', 'Chats', 'Rooms', '$state', '$window', 'groupsMentorData', '$ionicLoading',
-    function ($scope, $rootScope, Users, Chats, Rooms, $state, $window, groupsMentorData, $ionicLoading) {
+.controller('AdvisorCtrl', ['$scope', 'Users', 'Chats', 'Rooms', '$state', '$window', 'groupsMentorData', '$ionicLoading',
+    function ($scope, Users, Chats, Rooms, $state, $window, groupsMentorData, $ionicLoading) {
     console.log("Student Controller initialized");
     var stop;
     if(!$scope.schoolID){
