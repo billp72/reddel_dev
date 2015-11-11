@@ -3,7 +3,7 @@
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id        = "com.theopencircles.com.opencircles"
-        version   = "1.6.4">
+        version   = "1.6.5">
 
     <name>Open Circles</name>
 
@@ -40,7 +40,7 @@
     <preference name="SplashScreenDelay"          value="3000" />
     <preference name="phonegap-version"           value="cli-5.2.0" />
     <!-- ios overlay not on start up-->
-    <!--<preference name="StatusBarOverlaysWebView" value="false" />-->
+    <preference name="StatusBarOverlaysWebView" value="false" />
     <!--
         Define a specific version of PhoneGap to build into your app.
         <preference name="phonegap-version"       value="3.5.0" />
@@ -51,7 +51,6 @@
     <!-- Core plugins -->
     <gap:plugin name="com.ionic.keyboard" version="1.0.3" />
     <gap:plugin name="com.phonegap.plugins.pushplugin" version="2.5.0" />
-    <gap:plugin name="org.apache.cordova.battery-status" source="npm" />
     <gap:plugin name="org.apache.cordova.camera" source="npm" />
     <gap:plugin name="org.apache.cordova.media-capture" source="npm" />
     <gap:plugin name="org.apache.cordova.contacts" source="npm" />
@@ -63,14 +62,13 @@
     <!--<gap:plugin name="org.apache.cordova.file-transfer" />-->
     <gap:plugin name="org.apache.cordova.geolocation" source="npm" />
     <gap:plugin name="org.apache.cordova.globalization" source="npm" />
-    <!--<gap:plugin name="org.apache.cordova.inappbrowser" />-->
     <gap:plugin name="org.apache.cordova.media" source="npm" />
     <gap:plugin name="org.apache.cordova.network-information" source="npm" />
     <gap:plugin name="org.apache.cordova.splashscreen" source="npm" />
     <gap:plugin name="org.apache.cordova.vibration" source="npm" />
     <gap:plugin name="cordova-plugin-whitelist" source="npm" />
     <!-- ios plugin to hide or change status bar-->
-    <!--<gap:plugin name="cordova-plugin-statusbar" source="npm" />-->
+    <gap:plugin name="cordova-plugin-statusbar" source="npm" />
 
     <!-- Third party plugins -->
     <!-- A list of available plugins are available at https://build.phonegap.com/plugins -->

@@ -713,6 +713,7 @@ angular.module('mychat.services', ['firebase'])
                     $timeout.cancel(timeOutInteger);
                     cb(false);
                 }
+                timeOutOccured = false;
             }else{
                 var url = "http://theopencircles.com/opencircles/loadImage.jpg";
  
@@ -725,12 +726,12 @@ angular.module('mychat.services', ['firebase'])
                             timeout: 20 * 1000
                         }).
                         success(function(response){
-
+                            
                                if(!timeOutOccured){
                                     $timeout.cancel(timeOutInteger);
                                     cb(true);  
                                 }
-                                
+                                timeOutOccured = false;
                             }).
                             error(function(xhr, textStatus, errorThrown) {
                             
@@ -738,6 +739,7 @@ angular.module('mychat.services', ['firebase'])
                                         $timeout.cancel(timeOutInteger);
                                         cb(false);
                                     }
+                                    timeOutOccured = false;
                             });
                         
             }
