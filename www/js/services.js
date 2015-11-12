@@ -263,22 +263,22 @@ angular.module('mychat.services', ['firebase'])
         checkSchoolExist: function(schoolID){
             return $firebase(ref.child(schoolID).child('questions')).$asArray();
         },
-        addQuestionsToSchool: function(schoolID, userID, question, icon, questionID, displayName, email, groupID, groupName, status, avatar){
+        addQuestionsToSchool: function(params){
             var qdata = {
-                schoolID: schoolID,
-                userID: userID,
-                question: question,
-                icon: icon,
-                questionID: questionID,
-                displayName: displayName,
-                email: email,
-                groupID: groupID,
-                status: status,
-                avatar: avatar,
+                schoolID: params.schoolID,
+                userID: params.userID,
+                question: params.question,
+                icon: params.icon,
+                questionID: params.questionID,
+                displayName: params.displayName,
+                email: params.email,
+                groupID: params.groupID,
+                status: params.status,
+                avatar: params.avatar,
                 createdAt: Firebase.ServerValue.TIMESTAMP
             }
         
-            return $firebase(ref.child(schoolID).child('questions').child(groupID)).$asArray().$add(qdata);
+            return $firebase(ref.child(params.schoolID).child('questions').child(params.groupID)).$asArray().$add(qdata);
            
         },
          retrieveSingleQuestion: function (schoolID, questionID) {
@@ -293,7 +293,7 @@ angular.module('mychat.services', ['firebase'])
     // Might use a resource here that returns a JSON array
     var ref = new Firebase(firebaseUrl+'/users');
     var users = $firebase(ref).$asArray();
-    
+    //schoolID, ID, question, icon, questionID, prospectUserID, displayName, groupName, status, groupID, publicQuestionKey, avatar
     return {
         all: function () {
             return users;
@@ -301,32 +301,31 @@ angular.module('mychat.services', ['firebase'])
         getUserByID: function(studentID){
              return $firebase(ref.child(studentID).child('questions')).$asArray();
         },
-        addQuestionToUser: function(schoolID, ID, question, icon, questionID, prospectUserID, displayName, email, groupName, status, groupID, publicQuestionKey, avatar){
-            var user = this.getUserByID(ID);
-            if(!!questionID){
+        addQuestionToUser: function(params){
+            var user = this.getUserByID(params.ID);
+            if(!!params.questionID){//adds the event to self once they answer
                 return user.$add(
                     {
-                        schoolID: schoolID, 
-                        question: question, 
-                        prospectQuestionID: questionID, 
-                        prospectUserID: prospectUserID,
-                        displayName: displayName,
-                        email: email, 
-                        icon: icon,
+                        schoolID: params.schoolID, 
+                        question: params.question, 
+                        prospectQuestionID: params.questionID, 
+                        prospectUserID: params.prospectUserID,
+                        displayName: params.displayName, 
+                        icon: params.icon,
                         status: 'private',
-                        avatar: avatar
+                        avatar: params.avatar
                     });
-            }else{
+            }else{//adds event to self once they post
                 return user.$add(
                     {
-                        schoolID: schoolID, 
-                        question: question, 
-                        icon: icon,
-                        groupName: groupName,
-                        status: status,
-                        groupID: groupID,
-                        publicQuestionKey: publicQuestionKey,
-                        avatar: avatar
+                        schoolID: params.schoolID, 
+                        question: params.question, 
+                        icon: params.icon,
+                        groupName: params.groupName,
+                        status: params.status,
+                        groupID: params.groupID,
+                        publicQuestionKey: params.publicQuestionKey,
+                        avatar: params.avatar
                     });
             }
         },
@@ -364,14 +363,14 @@ angular.module('mychat.services', ['firebase'])
         removeItem: function (key){
             $window.localStorage.removeItem(key);
         },
-        addAnswerToAdvisor: function (from, schoolID, message, questionsID, userID, avatar){
-            var user = this.getUserConversation(userID, questionsID);
+        addAnswerToAdvisor: function (params){
+            var user = this.getUserConversation(params.userID, params.questionsID);
             var chatMessage = {
-                    from: from,
-                    message: message,
-                    schoolID: schoolID,
+                    from: params.from,
+                    message: params.message,
+                    schoolID: params.schoolID,
                     createdAt: Firebase.ServerValue.TIMESTAMP,
-                    avatar: avatar
+                    avatar: params.avatar
                 };
             return user.$add(chatMessage);
        },
@@ -421,10 +420,10 @@ angular.module('mychat.services', ['firebase'])
                 );
 
        },*/
-       updateProspectQuestion: function (studentID, questionID, advisorID, advisorKey, originalID, schoolID, groupID){
-            var update = ref.child(studentID).child('questions').child(questionID);
-                update.update({advisorID: advisorID, advisorKey: advisorKey, conversationStarted: true});
-                Rooms.getRef().child(schoolID).child('questions').child(groupID).child(originalID).remove(
+       updateProspectQuestion: function (params){
+            var update = ref.child(params.studentID).child('questions').child(params.questionID);
+                update.update({advisorID: params.advisorID, advisorKey: params.advisorKey, conversationStarted: true});
+                Rooms.getRef().child(params.schoolID).child('questions').child(params.groupID).child(params.originalID).remove(
                     function(err){
                         if(err){
                             alert('an error occured ' + err);
@@ -674,7 +673,6 @@ angular.module('mychat.services', ['firebase'])
         save: function (question){
             questions.$add(
                 {
-                    'organization': question.organization,
                     'question': question.question,
                     'school': question.school
                 }
