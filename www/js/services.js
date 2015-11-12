@@ -688,13 +688,14 @@ angular.module('mychat.services', ['firebase'])
     function ConnectionCheck ($http, $q, $timeout){
 
        var timeOutInteger = null;
-       var timeOutOccured = false;
 
        var net_callback = function (cb){
 
+            var timeOutOccured = false;
+
             timeOutInteger = $timeout(function () {
                 timeOutOccured = true;
-                cb(false);
+                cb('Your connection is very slow');
             }, 20 * 1000 );
 
             var networkState = navigator.connection.type;
@@ -711,9 +712,9 @@ angular.module('mychat.services', ['firebase'])
             if(states[networkState] == 'No network connection'){
                 if(!timeOutOccured){
                     $timeout.cancel(timeOutInteger);
-                    cb(false);
+                    cb(states[networkState]);
                 }
-                timeOutOccured = false;
+                
             }else{
                 var url = "http://theopencircles.com/opencircles/loadImage.jpg";
  
@@ -729,17 +730,15 @@ angular.module('mychat.services', ['firebase'])
                             
                                if(!timeOutOccured){
                                     $timeout.cancel(timeOutInteger);
-                                    cb(true);  
+                                    cb(false);  
                                 }
-                                timeOutOccured = false;
                             }).
                             error(function(xhr, textStatus, errorThrown) {
                             
                                     if(!timeOutOccured){
                                         $timeout.cancel(timeOutInteger);
-                                        cb(false);
+                                        cb('There was an error with your ' + states[networkState]);
                                     }
-                                    timeOutOccured = false;
                             });
                         
             }

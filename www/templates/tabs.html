@@ -18,10 +18,10 @@ navigation history that also transitions its views in and out.
         <ion-nav-view name="tab-settingsMentor"></ion-nav-view>
     </ion-tab>
 <!-- Current Selected Chat Tab - hidden -->
-    <ion-tab title="Conversation" href="#/menu/tab/chat" hidden="true">
+    <ion-tab title="Conversation" on-select="tabSelected('chatprivate')" href="#/menu/tab/chat" hidden="true">
         <ion-nav-view name="tab-chat"></ion-nav-view>
     </ion-tab>
-    <ion-tab title="Conversation" href="#/menu/tab/publicchat" hidden="true">
+    <ion-tab title="Conversation" on-select="tabSelected('chatpublic')" href="#/menu/tab/publicchat" hidden="true">
         <ion-nav-view name="tab-publicchat"></ion-nav-view>
     </ion-tab>
     <ion-tab title="Schedule" href="#/menu/tab/ask" hidden="true">
