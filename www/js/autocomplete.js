@@ -94,6 +94,41 @@ angular.module('mychat.autocomplete', ['firebase'])
     }
 }])
 /*
+*order alphabetically
+*/
+.factory('orderAlphanumeric', ['$q', '$timeout', 'groupsMentorData', 'Users',
+        function ($q, $timeout, groupsMentorData, Users){
+            var retrieveDataSort = function (cb){
+                    groupsMentorData.getGroupByID(Users.getIDS('schoolID'), function(data){
+
+                        var deferred = $q.defer();
+                        
+                        var schools = data.sort(function(a, b) {
+
+                            var schoolA = a.groupName.toLowerCase();
+                            var schoolB = b.groupName.toLowerCase();
+
+                            if(schoolA > schoolB) return  1;
+                            if(schoolA < schoolB) return -1;
+
+                            return 0;
+                        });
+
+                        $timeout( function(){
+        
+                            deferred.resolve( schools );
+
+                        }, 100);
+
+                        cb(deferred.promise);
+                });
+            }
+
+    return {
+        retrieveDataSort: retrieveDataSort
+    }
+}])
+/*
 *get groups data
 */
 .factory('groupsMentorData', ['$firebase', function ($firebase){

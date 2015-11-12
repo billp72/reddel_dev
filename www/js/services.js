@@ -303,7 +303,7 @@ angular.module('mychat.services', ['firebase'])
         },
         addQuestionToUser: function(params){
             var user = this.getUserByID(params.ID);
-            if(!!params.questionID){//adds the event to self once they answer
+            if(!!params.questionID){//adds the event to self once they answer - private
                 return user.$add(
                     {
                         schoolID: params.schoolID, 
@@ -315,7 +315,7 @@ angular.module('mychat.services', ['firebase'])
                         status: 'private',
                         avatar: params.avatar
                     });
-            }else{//adds event to self once they post
+            }else{//adds event to self once they post - both private and public
                 return user.$add(
                     {
                         schoolID: params.schoolID, 
