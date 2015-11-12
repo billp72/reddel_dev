@@ -293,7 +293,7 @@ angular.module('mychat.services', ['firebase'])
     // Might use a resource here that returns a JSON array
     var ref = new Firebase(firebaseUrl+'/users');
     var users = $firebase(ref).$asArray();
-    //schoolID, ID, question, icon, questionID, prospectUserID, displayName, groupName, status, groupID, publicQuestionKey, avatar
+    
     return {
         all: function () {
             return users;

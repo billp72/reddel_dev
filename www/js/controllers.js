@@ -536,7 +536,6 @@ settings for mentor
             },true);
         }
     });
-
     $scope.sendMessage = function (msg) {
         if(!firstMessage){
             Chats.send($scope.displayName, schoolID, msg, toggleUserID, toggleQuestionID, Users.getIDS('avatar'));
