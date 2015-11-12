@@ -423,8 +423,31 @@ settings for mentor
 /*
 * opens the private chat room
 */
-.controller('ChatCtrl', ['$scope', 'Chats', 'Users', 'Rooms', '$state', '$window', '$ionicModal', '$ionicPopup', '$ionicScrollDelegate', '$timeout', 'RequestsService', 'ConnectionCheck',
-    function ($scope, Chats, Users, Rooms, $state, $window, $ionicModal, $ionicPopup, $ionicScrollDelegate, $timeout, RequestsService, ConnectionCheck) {
+.controller('ChatCtrl', [
+                '$scope', 
+                'Chats', 
+                'Users', 
+                'Rooms', 
+                '$state',  
+                '$ionicModal', 
+                '$ionicPopup',
+                '$ionicLoading', 
+                '$ionicScrollDelegate', 
+                '$timeout', 
+                'RequestsService', 
+                'ConnectionCheck',
+        function ($scope, 
+                  Chats, 
+                  Users, 
+                  Rooms, 
+                  $state,  
+                  $ionicModal, 
+                  $ionicPopup,
+                  $ionicLoading, 
+                  $ionicScrollDelegate, 
+                  $timeout, 
+                  RequestsService, 
+                  ConnectionCheck) {
         
         $scope.$watch('tabs', function(old, newv){
             if(newv !== 'chatprivate' || old === 'chatprivate'){
@@ -627,8 +650,27 @@ settings for mentor
 * opens the public chat room
 *
 */
-.controller('PublicChatCtrl', ['$scope', 'PublicChat', 'Users', '$state', '$window', '$ionicModal', '$ionicPopup', '$ionicScrollDelegate', '$timeout', 'RequestsService', 'ConnectionCheck',
-    function ($scope, PublicChat, Users, $state, $window, $ionicModal, $ionicPopup, $ionicScrollDelegate, $timeout, RequestsService, ConnectionCheck) {
+.controller('PublicChatCtrl', [
+                    '$scope', 
+                    'PublicChat', 
+                    'Users', 
+                    '$state',  
+                    '$ionicModal', 
+                    '$ionicPopup', 
+                    '$ionicScrollDelegate', 
+                    '$timeout', 
+                    'RequestsService', 
+                    'ConnectionCheck',
+        function ($scope, 
+                  PublicChat, 
+                  Users, 
+                  $state, 
+                  $ionicModal, 
+                  $ionicPopup, 
+                  $ionicScrollDelegate, 
+                  $timeout, 
+                  RequestsService, 
+                  ConnectionCheck) {
 
         $scope.$watch('tabs', function(old, newv){
             if(newv !== 'chatpublic' || old === 'chatpublic'){
