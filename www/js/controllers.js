@@ -10,7 +10,8 @@ angular.module('mychat.controllers', [])
     '$ionicLoading', 
     '$rootScope', 
     '$ionicHistory', 
-    'schoolFormDataService', 
+    'schoolFormDataService',
+    'ConnectionCheck', 
     'stripDot',
     'pushService',
     '$window',
@@ -24,13 +25,27 @@ angular.module('mychat.controllers', [])
     $ionicLoading, 
     $rootScope, 
     $ionicHistory, 
-    schoolFormDataService, 
+    schoolFormDataService,
+    ConnectionCheck, 
     stripDot,
     pushService,
     $window) {
 
     var ref = new Firebase($scope.firebaseUrl);
     var auth = $firebaseAuth(ref);
+
+    ConnectionCheck.netCallback(function(state){
+                if(state){
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Warning!',
+                        template: state
+                });
+                $timeout(function(){
+                    alertPopup.close();
+                }, 2000);
+            }
+    });
+
     $scope.$on('$ionicView.enter', function(){
             $ionicHistory.clearCache();
             $ionicHistory.clearHistory();
@@ -423,7 +438,7 @@ settings for mentor
                 'Chats', 
                 'Users', 
                 'Rooms', 
-                '$state',  
+                '$state',
                 '$ionicModal', 
                 '$ionicPopup',
                 '$ionicLoading', 
@@ -443,7 +458,9 @@ settings for mentor
                   $timeout, 
                   RequestsService, 
                   ConnectionCheck) {
-        
+
+        $ionicLoading.show();
+
         $scope.$watch('tabs', function(old, newv){
             if(newv !== 'chatprivate' || old === 'chatprivate'){
                 ConnectionCheck.netCallback(function(state){
@@ -462,7 +479,7 @@ settings for mentor
                 })
             }
         });
-  
+        
     var 
         advisorKey          = $state.params.advisorKey,
         schoolID            = $state.params.schoolID,
@@ -518,6 +535,9 @@ settings for mentor
         if (roomName) {
             $scope.roomName = " - " + roomName;
             $scope.chats = Chats.all($scope.displayName);
+            $scope.chats.$loaded(function(data){
+                $ionicLoading.hide();
+            });
             $scope.$watch('chats', function(newValue, oldValue){
                 $timeout(function() {
                     keepKeyboardOpen();
@@ -652,7 +672,8 @@ settings for mentor
                     'Users', 
                     '$state',  
                     '$ionicModal', 
-                    '$ionicPopup', 
+                    '$ionicPopup',
+                    '$ionicLoading', 
                     '$ionicScrollDelegate', 
                     '$timeout', 
                     'RequestsService', 
@@ -662,11 +683,14 @@ settings for mentor
                   Users, 
                   $state, 
                   $ionicModal, 
-                  $ionicPopup, 
+                  $ionicPopup,
+                  $ionicLoading, 
                   $ionicScrollDelegate, 
                   $timeout, 
                   RequestsService, 
                   ConnectionCheck) {
+
+        $ionicLoading.show();
 
         $scope.$watch('tabs', function(old, newv){
             if(newv !== 'chatpublic' || old === 'chatpublic'){
@@ -679,11 +703,8 @@ settings for mentor
                         $timeout(function(){
                             alertPopup.close();
                         }, 2000);
-                        /*alertPopup.then(function(res) {
-                            console.log(res);
-                        });*/
                     }
-                })
+                });
             }
         });
 
@@ -737,6 +758,9 @@ settings for mentor
         if (roomName) {
             $scope.roomName = " - " + roomName;
             $scope.chats = PublicChat.all($scope.displayName);
+            $scope.chats.$loaded(function(data){
+                $ionicLoading.hide();
+            })
             $scope.$watch('chats', function(newValue, oldValue){
                 $timeout(function() {
                     keepKeyboardOpen();
@@ -830,7 +854,7 @@ settings for mentor
                 prospectQuestionID is the original key that is in the school and is retrieved 
                 like room.$id
                 */
-                $state.go('menu.tab.chat', {
+                $state.transitionTo('menu.tab.chat', {
                     advisorID: $scope.userID,
                     schoolID: $scope.schoolID,
                     advisorKey: selfKey,//name.$id get self key
@@ -843,15 +867,18 @@ settings for mentor
                     group: '',
                     who: 'answerer',
                     avatar: avatar   
-                });
+                },{reload: true, inherit: true, notify: true });
+
                 Users.toggleQuestionBackAfterClick($scope.userID, selfKey);//toggle back own question name.$id
             }
 
             if(!!advisorID){ //question asker -- response return
             /*when advisor adds their advisorID and advisorKey, the asker can chat 
             because the question has been answered
+
+            $state.transitionTo($state.current, $stateParams, { reload: true, inherit: true, notify: true });
             */
-                $state.go('menu.tab.chat', {
+                $state.transitionTo('menu.tab.chat', {
                     advisorID: advisorID,
                     schoolID: schoolID,
                     advisorKey: advisorKey,
@@ -865,11 +892,12 @@ settings for mentor
                     who: 'asker',
                     avatar: avatar
 
-                });
+                }, {reload: true, inherit: true, notify: true });
+
                 Users.toggleQuestionBackAfterClick($scope.userID, selfKey);//toggle back own question name.$id
             }
         }else{
-            $state.go('menu.tab.publicchat', {
+            $state.transitionTo('menu.tab.publicchat', {
                 prospectUserID: $scope.userID,
                 prospectQuestionID: selfKey,
                 schoolsQuestionID: publicQuestionKey,
@@ -878,7 +906,7 @@ settings for mentor
                 group: groupID,
                 wrap: 'wrap',
                 avatar: avatar
-            });
+            },{reload: true, inherit: true, notify: true });
             //Users.toggleQuestionBackAfterClick($scope.userID, selfKey);
         }
     }
@@ -936,15 +964,16 @@ settings for mentor
         $scope.school = Rooms.getSchoolBySchoolID($scope.schoolID, $scope.groupID);
             $scope.school.$loaded(function(data){
                 $scope.rooms = data;
+
+                $ionicLoading.hide();
         });
         Users.updateUserGroup(val.groupID, val.groupName, $scope.userID);  
 
-        $ionicLoading.hide();
     });
     
     $scope.openChatRoom = function (question, prospectUserID, prospectQuestionID, schoolsQuestionID, displayName, email, status, avatar) {
        if(status === 'private'){
-            $state.go('menu.tab.chat', {
+            $state.transitionTo('menu.tab.chat', {
                 advisorID: $scope.userID,
                 schoolID: $scope.schoolID,
                 advisorKey: '',
@@ -957,9 +986,9 @@ settings for mentor
                 group: $scope.groupID,
                 who: 'answerer',
                 avatar: avatar
-            });
+            },{reload: true, inherit: true, notify: true });
        }else{
-             $state.go('menu.tab.publicchat', {
+             $state.transitionTo('menu.tab.publicchat', {
                 prospectUserID: prospectUserID,
                 prospectQuestionID: prospectQuestionID,//not currently avaiable for wrap question
                 schoolsQuestionID: schoolsQuestionID,
@@ -968,7 +997,7 @@ settings for mentor
                 group: $scope.groupID,
                 wrap: '',//hides ability to wrap question
                 avatar: avatar
-            });
+            },{reload: true, inherit: true, notify: true });
        }
     }
  
@@ -1064,7 +1093,7 @@ settings for mentor
                                 }
                             ).then(function(){
                                 $ionicLoading.hide();
-                                $state.go('menu.tab.studentc');
+                                $state.transitionTo('menu.tab.studentc',{},{ reload: true, inherit: true, notify: true });
                                 $scope.data.search = '';
                                 $scope.user.question = '';
                             });
@@ -1098,7 +1127,7 @@ settings for mentor
                             } 
                             ).then(function(){
                                 $ionicLoading.hide();
-                                $state.go('menu.tab.studentc');
+                                $state.transitionTo('menu.tab.studentc',{},{ reload: true, inherit: true, notify: true });
                                 $scope.data.search = '';
                                 $scope.user.question = '';
                             });
