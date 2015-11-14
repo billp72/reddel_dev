@@ -554,6 +554,14 @@ settings for mentor
         if(!firstMessage){
             Chats.send($scope.displayName, schoolID, msg, toggleUserID, toggleQuestionID, Users.getIDS('avatar'));
             $scope.IM.textMessage = "";
+
+            RequestsService.pushNote(
+            {
+                'message':'Message from: ' + $scope.displayName,
+                'userID': toggleUserID,
+                'method':'GET',
+                'path':'push'
+            });
         }else{//first time an advisor asnwers a question
                if($scope.displayName === displayName){
                     alert('No need to attend your own event.');
@@ -612,18 +620,19 @@ settings for mentor
 
                     $scope.addAnswerAdvisor = null;
                     $scope.updateProspectQuestion = null;
+
+                    RequestsService.pushNote(
+                    {
+                        'message':'Message from: ' + $scope.displayName,
+                        'userID': toggleUserID,
+                        'method':'GET',
+                        'path':'push'
+                    });
                 }).catch (function(error){
                     alert('error sending message: ' + error);
                 })
               
         }
-        /*RequestsService.pushNote(
-            {
-             'message':'Message from: ' + $scope.displayName,
-             'userID': toggleUserID,
-             'method':'GET',
-             'path':'push'
-            });*/
 
     }
 //removes a single chat message
@@ -799,12 +808,12 @@ settings for mentor
     $scope.removePerm = function () {
 
        var val = PublicChat.wrapitup( 
-                                $scope.schoolID, 
-                                schoolsQuestionID, 
-                                prospectQuestionID, 
-                                prospectUserID,
-                                group
-                            );
+                        $scope.schoolID, 
+                        schoolsQuestionID, 
+                        prospectQuestionID, 
+                        prospectUserID,
+                        group
+                    );
        if(typeof val !== "string"){
             $scope.modal.hide();
             $state.go('menu.tab.student', {
@@ -976,7 +985,7 @@ settings for mentor
         Users.updateUserGroup(val.groupID, val.groupName, $scope.userID);  
 
     });
-    
+   
     $scope.openChatRoom = function (question, prospectUserID, prospectQuestionID, schoolsQuestionID, displayName, email, status, avatar) {
        if(status === 'private'){
             $state.transitionTo('menu.tab.chat', {
