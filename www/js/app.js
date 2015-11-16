@@ -11,20 +11,26 @@ function onDeviceReady() {
 
     angular.bootstrap(document, ["mychat"]);
 
+    //document.addEventListener("pause", onResume, false);
+    document.addEventListener("resume", onResume, false);
+
 }
 //console.log("binding device ready");
 // Registering onDeviceReady callback with deviceready event
 document.addEventListener("deviceready", onDeviceReady, false);
 
+function onResume(){
+    navigator.splashscreen.show();
+    location.reload();
+}
 // 'mychat.services' is found in services.js
 // 'mychat.controllers' is found in controllers.js
 angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controllers', 'mychat.services', 'mychat.directives', 'mychat.autocomplete', 'mychat.filters'])
 
-    .run(function ($ionicPlatform, $rootScope, $location, Auth, $ionicLoading, $window) {
+    .run(function ($ionicPlatform, $rootScope, $location, Auth, $ionicLoading, $window, $state) {
 
     $ionicPlatform.ready(function() {
         //localstorage check
-
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         /*Google keys
          * key: AIzaSyAbXzuAUk1EICCdfpZhoA6-TleQrPWxJuI
@@ -50,7 +56,30 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
                 $ionicLoading.hide();
                 $location.path('/login');
             }else{
-                $location.path('/studentrooms');
+
+                setTimeout(function() {
+
+                    navigator.splashscreen.hide();
+
+                }, 2000);
+
+                $scope.$watch('tabs', function(old, newv){
+                    var screenis;
+                    if(newv === 'events' || old === 'events'){
+                        screenis = 'menu.tab.student';
+                    }else if(newv === 'conversations' || old === 'conversations'){
+                        screenis = 'menu.tab.studentc';
+                    }else if(newv === 'ask' || old === 'ask'){
+                        screenis = 'menu.tab.ask';
+                    }else if(newv === 'chatpublic' || old === 'chatpublic'){
+                        screenis = 'menu.tab.publicchat';
+                    }else if(newv === 'chatprivate' || old === 'chatprivate'){
+                        screenis = 'menu.tab.chat';
+                    }else if(newv === 'settings' || old === 'settings'){
+                        screenis = 'menu.tab.settingsMentor';
+                    }
+                    $state.go(screenis);
+                });
             }
         });
 
