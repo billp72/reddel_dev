@@ -11,7 +11,6 @@ angular.module('mychat.controllers', [])
     '$rootScope', 
     '$ionicHistory', 
     'schoolFormDataService',
-    'ConnectionCheck', 
     'stripDot',
     'pushService',
     '$window',
@@ -26,25 +25,11 @@ angular.module('mychat.controllers', [])
     $rootScope, 
     $ionicHistory, 
     schoolFormDataService,
-    ConnectionCheck, 
     stripDot,
     pushService,
     $window) {
-
     var ref = new Firebase($scope.firebaseUrl);
     var auth = $firebaseAuth(ref);
-
-    ConnectionCheck.netCallback(function(state){
-                if(state){
-                    var alertPopup = $ionicPopup.alert({
-                        title: 'Warning!',
-                        template: state
-                });
-                $timeout(function(){
-                    alertPopup.close();
-                }, 2000);
-            }
-    });
 
     $scope.$on('$ionicView.enter', function(){
             $ionicHistory.clearCache();
@@ -144,8 +129,7 @@ angular.module('mychat.controllers', [])
            $ionicLoading.show({
                 template: 'Signing Up...'
             });
-           console.log('auth ', auth);
-           console.log('user ', user);
+         
                 auth.$createUser({
                     email: user.schoolemail,
                     password: stripDot.generatePass()
@@ -247,8 +231,7 @@ angular.module('mychat.controllers', [])
                 $ionicLoading.show({
                     template: 'Signing In...'
                 });
-                    console.log('auth ', auth);
-                    console.log('user ', user);
+
                     auth.$authWithPassword({
                         email: user.email,
                         password: user.pwdForLogin
@@ -304,7 +287,7 @@ angular.module('mychat.controllers', [])
     }
 }])
 /*
-settings for mentor
+settings cntrl
 */
 .controller('SettingsCtrlMentor', ['$scope', '$rootScope','Users', 'ChangePassword', '$state', '$ionicLoading', '$ionicModal', 'Auth', 'groupsMentorsDataService',
     function ($scope, $rootScope, Users, ChangePassword, $state, $ionicLoading, $ionicModal, Auth, groupsMentorsDataService) { 
@@ -442,46 +425,23 @@ settings for mentor
                 'Users', 
                 'Rooms', 
                 '$state',
-                '$ionicModal', 
-                '$ionicPopup',
+                '$ionicModal',
                 '$ionicLoading', 
                 '$ionicScrollDelegate', 
                 '$timeout', 
-                'RequestsService', 
-                'ConnectionCheck',
+                'RequestsService',
         function ($scope, 
                   Chats, 
                   Users, 
                   Rooms, 
                   $state,  
-                  $ionicModal, 
-                  $ionicPopup,
+                  $ionicModal,
                   $ionicLoading, 
                   $ionicScrollDelegate, 
                   $timeout, 
-                  RequestsService, 
-                  ConnectionCheck) {
+                  RequestsService) {
 
-        $ionicLoading.show();
-
-        $scope.$watch('tabs', function(old, newv){
-            if(newv !== 'chatprivate' || old === 'chatprivate'){
-                ConnectionCheck.netCallback(function(state){
-                    if(state){
-                        var alertPopup = $ionicPopup.alert({
-                            title: 'Warning!',
-                            template: state
-                        });
-                        $timeout(function(){
-                            alertPopup.close();
-                        }, 2000);
-                        /*alertPopup.then(function(res) {
-                            console.log(res);
-                        });*/
-                    }
-                })
-            }
-        });
+            $ionicLoading.show();
         
     var 
         advisorKey          = $state.params.advisorKey,
@@ -571,13 +531,11 @@ settings for mentor
         }else{//first time an advisor asnwers a question
                if($scope.displayName === displayName){
                     alert('No need to attend your own event.');
-
                     return;
                 }
                 $ionicLoading.show({
                     template: 'Sending...'
                 });
-                console.log($state.params);
 
                 Users.addQuestionToUser({//add the question to self
                     schoolID:schoolID, 
@@ -602,7 +560,7 @@ settings for mentor
                             userID: advisorID, 
                             avatar: Users.getIDS('avatar')
                         }).then(function(){}).catch (function(error){
-                            alert('error sending message: ' + error);
+                            alert('error adding event to advisor: ' + error);
                         });               
                 })
                 .then(function (results){
@@ -640,7 +598,7 @@ settings for mentor
                 }).catch (function(error){
                     alert('error sending message: ' + error);
                 })
-              
+
         }
 
     }
@@ -693,41 +651,21 @@ settings for mentor
                     'Users', 
                     '$state',  
                     '$ionicModal', 
-                    '$ionicPopup',
                     '$ionicLoading', 
                     '$ionicScrollDelegate', 
                     '$timeout', 
                     'RequestsService', 
-                    'ConnectionCheck',
         function ($scope, 
                   PublicChat, 
                   Users, 
                   $state, 
                   $ionicModal, 
-                  $ionicPopup,
                   $ionicLoading, 
                   $ionicScrollDelegate, 
                   $timeout, 
-                  RequestsService, 
-                  ConnectionCheck) {
+                  RequestsService) {
 
-        $ionicLoading.show();
-
-        $scope.$watch('tabs', function(old, newv){
-            if(newv !== 'chatpublic' || old === 'chatpublic'){
-                ConnectionCheck.netCallback(function(state){
-                    if(state){
-                        var alertPopup = $ionicPopup.alert({
-                            title: 'Warning!',
-                            template: state
-                        });
-                        $timeout(function(){
-                            alertPopup.close();
-                        }, 2000);
-                    }
-                });
-            }
-        });
+            $ionicLoading.show();
 
     var 
         prospectUserID      = $state.params.prospectUserID,
@@ -942,7 +880,6 @@ settings for mentor
 .controller('AdvisorCtrl', ['$scope', 'Users', 'Chats', 'Rooms', '$state', '$window', 'orderAlphanumeric', '$ionicLoading',
     function ($scope, Users, Chats, Rooms, $state, $window, orderAlphanumeric, $ionicLoading) {
 
-    var stop;
     if(!$scope.schoolID){
         $scope.schoolID = Users.getIDS('schoolID');
     }
@@ -1081,15 +1018,19 @@ settings for mentor
                 alert('please select a group');
                 return;
           } 
-    
+          if(quest.question.amount <= 14){
+                alert('questions must be at least 15 characters long');
+                return;
+           }
           status = !!quest.ischecked ? 'public' : 'private';
          
           grpID = quest.group.groupID;
           grpName = quest.group.groupName;
-                if(quest.question.amount >= 15){
-                    $ionicLoading.show({
-                        template: 'Sending...'
-                    });
+           
+          $ionicLoading.show({
+                template: 'Sending...'
+           });
+
                 if(status === 'public'){
                         Rooms.addQuestionsToSchool(
                             {
@@ -1159,6 +1100,7 @@ settings for mentor
                             });
                         });
                     }
+
                     Questions.save({
                         question: quest.question.value,
                         school: $scope.schoolID
@@ -1171,10 +1113,6 @@ settings for mentor
                     }
 
                     */
-
-                }else{
-                    alert('questions must be at least 15 characters long');
-                }
-            
-    }
+         
+            }
 }]);

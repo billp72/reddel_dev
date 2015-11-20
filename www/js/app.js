@@ -2,8 +2,6 @@
 var firebaseUrl = "https://reddel.firebaseio.com";
 
 function onDeviceReady() {
-    var timer = false,
-        timeUp;
 
     setTimeout(function() {
 
@@ -11,40 +9,47 @@ function onDeviceReady() {
 
     }, 3000);
 
-    angular.bootstrap(document, ["mychat"]);
+    /*Fixes a change in phonegap that forces FB into offline mode when minimized*/
+    var ref = new Firebase(firebaseUrl+'/users');
 
     document.addEventListener("resume", onResume, false);
     document.addEventListener("pause", onPause, false);
 
     function onPause(){
-        timer = setTimeout(function(){
-            timeUp = true;
-        }, 6000 * 60 * 60);
+        Firebase.goOffline();
     } 
 
-    function onResume(){ 
-        if(timeUp){
-            navigator.splashscreen.show();
-            location.reload(); 
-            timeUp = false;
-        }    
-        clearTimeout(timer);
-    }
+    function onResume(){
+        Firebase.goOnline();
+    } 
+
+    angular.bootstrap(document, ["mychat"]);
 
 }
 //console.log("binding device ready");
 // Registering onDeviceReady callback with deviceready event
 document.addEventListener("deviceready", onDeviceReady, false);
 
-// 'mychat.services' is found in services.js
-// 'mychat.controllers' is found in controllers.js
 angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controllers', 'mychat.services', 'mychat.directives', 'mychat.autocomplete', 'mychat.filters'])
 
-    .run(function ($ionicPlatform, $rootScope, $location, Auth, $ionicLoading, $window, $ionicTabsDelegate) {
+    .run(function ($ionicPlatform, $rootScope, $location, Auth, $ionicLoading, $window, $state, $timeout) {
 
-    $ionicPlatform.ready(function () {        
-        //localstorage check
-        // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+    $ionicPlatform.ready(function () {
+
+        /*
+        deps: $ionicPopup, ConnectionCheck
+        ConnectionCheck.netCallback(function(state){
+            if(state){
+                alertPopup = $ionicPopup.alert({
+                        title: 'Warning!',
+                        template: state
+                });
+                $timeout(function(){
+                    alertPopup.close();
+                }, 2000);
+            }
+        });*/
+            
         /*Google keys
          * key: AIzaSyAbXzuAUk1EICCdfpZhoA6-TleQrPWxJuI
          * Project Number: open-circles-1064/346007849782
@@ -63,27 +68,30 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
 
         $rootScope.firebaseUrl = firebaseUrl;
         $rootScope.displayName = null;
+        $rootScope.email       = null;
+        $rootScope.schoolID    = null;
+        $rootScope.group       = null;
+        $rootScope.gender      = null;
+        //$rootScope.groupKey  = null
+        $rootScope.userID      = null;
+        $rootScope.displayName = null;
+        $rootScope.superuser   = null;
 
         Auth.$onAuth(function (authData) {
+            $ionicLoading.hide();
             if (!authData) {
-                console.log("Logged out");
-                $ionicLoading.hide();
                 $location.path('/login');
             }else{
-               if($ionicTabsDelegate.selectedIndex() === 3){
-                    $ionicTabsDelegate.select(1);
-                }
-                setTimeout(function() {
-
-                    navigator.splashscreen.hide();
-
-                }, 1000);
-
-            }
+                $timeout(function () {
+                    $state.go('menu.tab.student');
+                },10);
+            }   
         });
-
-
-        $rootScope.$on("$stateChangeError", function (event, toState, toParams, fromState, fromParams, error) {
+        //params: event, toState, toParams, fromState, fromParams
+        $rootScope.$on("$stateChangeStart", function (){
+            $ionicLoading.hide();
+        });
+        $rootScope.$on("$stateChangeError", function (error) {
             // We can catch the error thrown when the $requireAuth promise is rejected
             // and redirect the user back to the home page
             if (error === "AUTH_REQUIRED") {

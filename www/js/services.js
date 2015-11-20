@@ -409,7 +409,7 @@ angular.module('mychat.services', ['firebase'])
                 
                 var onComplete = function(error) {
                     if (error) {
-                        console.log('Synchronization failed '+ error);
+                        alert('Synchronization failed '+ error);
                     } else {
                         Rooms.getRef().child(params.schoolID).child('questions').child(params.groupID).child(params.originalID).remove(
                             function(err){
@@ -429,10 +429,8 @@ angular.module('mychat.services', ['firebase'])
        },
        getGroupKeys: function (){
             var deferred = $q.defer();
-            //console.log(groupID, schoolID);
             var keys = [];
             ref.orderByKey().on("child_added", function(snapshot) {
-                //console.log(snapshot.key());
                 keys.push(snapshot.key());
             
                 $timeout( function(){
@@ -579,15 +577,13 @@ angular.module('mychat.services', ['firebase'])
                 //my_media.play();
           } else {
             if (event.coldstart) {
-                console.log('COLDSTART NOTIFICATION');
+                 navigator.notification.vibrate(1000);
             } else {
-                console.log('BACKGROUND NOTIFICATION');
+                 navigator.notification.vibrate(1000);
             }
           }
 
           //navigator.notification.alert(event.payload.message);
-          navigator.notification.vibrate(1000);
-
           console.log('MESSAGE -> MSG: ' + event.payload.message);
           //Only works for GCM
           console.log('MESSAGE -> MSGCNT: ' + event.payload.msgcnt);
@@ -607,7 +603,7 @@ angular.module('mychat.services', ['firebase'])
   // handle APNS notifications for iOS
   $window.successIosHandler = function (result) {
     console.log('result = ' + result);
-    navigator.notification.alert(result);
+    //navigator.notification.alert(result);
   };
   
   $window.onNotificationAPN = function (e) {
@@ -670,21 +666,24 @@ angular.module('mychat.services', ['firebase'])
         }
     }
 }])
-.service('ConnectionCheck', ['$http', '$q', '$timeout', ConnectionCheck])
+.service('ConnectionCheck', ['$http', '$q', '$timeout', '$firebase', ConnectionCheck])
 .service('RequestsService', ['$http', '$q', '$ionicLoading',  RequestsService]);
 
-    function ConnectionCheck ($http, $q, $timeout){
+    function ConnectionCheck ($http, $q, $firebase){
 
-       var timeOutInteger = null;
+       var ref = new Firebase(firebaseUrl);
+       //var timeOutInteger = null;
 
        var net_callback = function (cb){
 
-            var timeOutOccured = false;
+            //var timeOutOccured = false;
 
+            /*
+            deps: $timeout
             timeOutInteger = $timeout(function () {
                 timeOutOccured = true;
-                cb('Your connection is very slow');
-            }, 20 * 1000 );
+                $timeout.cancel(timeOutInteger);
+            }, 20 * 1000 );*/
 
             var networkState = navigator.connection.type;
  
@@ -699,35 +698,20 @@ angular.module('mychat.services', ['firebase'])
 
             if(states[networkState] == 'No network connection'){
                 if(!timeOutOccured){
-                    $timeout.cancel(timeOutInteger);
+                    //$timeout.cancel(timeOutInteger);
                     cb(states[networkState]);
                 }
                 
             }else{
-                var url = "http://theopencircles.com/opencircles/loadImage.jpg";
- 
-                $http(
-                        { 
-                            type: "GET",
-                            data: "{}",
-                            url: url,
-                            cache: false,
-                            timeout: 20 * 1000
-                        }).
-                        success(function(response){
+              
+                    ref.child('.info/connected').on('value', function(connectedSnap) {
+                        if (connectedSnap.val() === true) {
+                            cb(false);  
                             
-                               if(!timeOutOccured){
-                                    $timeout.cancel(timeOutInteger);
-                                    cb(false);  
-                                }
-                            }).
-                            error(function(xhr, textStatus, errorThrown) {
-                            
-                                    if(!timeOutOccured){
-                                        $timeout.cancel(timeOutInteger);
-                                        cb('There was an error with your ' + states[networkState]);
-                                    }
-                            });
+                        } else {
+                            cb('There was an error with your ' + states[networkState]); 
+                        }
+                    });
                         
             }
 
