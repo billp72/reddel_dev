@@ -666,24 +666,22 @@ angular.module('mychat.services', ['firebase'])
         }
     }
 }])
-.service('ConnectionCheck', ['$http', '$q', '$timeout', '$firebase', ConnectionCheck])
+.service('ConnectionCheck', ['$http', '$timeout', '$firebase', ConnectionCheck])
 .service('RequestsService', ['$http', '$q', '$ionicLoading',  RequestsService]);
 
-    function ConnectionCheck ($http, $q, $firebase){
+    function ConnectionCheck ($http, $timeout, $firebase){
 
        var ref = new Firebase(firebaseUrl);
-       //var timeOutInteger = null;
+       var base_url = 'http://www.theopencircles.com/opencircles/loadImage.jpg';
+       var timeOutInteger = null;
 
        var net_callback = function (cb){
 
-            //var timeOutOccured = false;
+            var timeOutOccured = false;
 
-            /*
-            deps: $timeout
             timeOutInteger = $timeout(function () {
                 timeOutOccured = true;
-                $timeout.cancel(timeOutInteger);
-            }, 20 * 1000 );*/
+            }, 7 * 1000);
 
             var networkState = navigator.connection.type;
  
@@ -698,18 +696,41 @@ angular.module('mychat.services', ['firebase'])
 
             if(states[networkState] == 'No network connection'){
                 if(!timeOutOccured){
-                    //$timeout.cancel(timeOutInteger);
+                    $timeout.cancel(timeOutInteger);
                     cb(states[networkState]);
                 }
                 
             }else{
-              
+        
                     ref.child('.info/connected').on('value', function(connectedSnap) {
                         if (connectedSnap.val() === true) {
-                            cb(false);  
+
+                            $http({
+                                method: 'GET',
+                                url: base_url,
+                                data: '{}',
+                                timeout: 7 * 1000
+                            })
+                            .success(function(response)
+                            {
+                                if(timeOutOccured){
+                                    cb('Your '+ states[networkState] + ' is very poor.');
+                                    $timeout.cancel(timeOutInteger);
+                                }else{
+                                    cb(false);
+                                    $timeout.cancel(timeOutInteger);
+                                }
+                            })
+                            .error(function(data, status, headers, config)
+                            {
+                                cb('Timeout: your '+states[networkState]+' is very poor');
+                                $timeout.cancel(timeOutInteger);
+                            });
+                             
                             
                         } else {
-                            cb('There was an error with your ' + states[networkState]); 
+                            $timeout.cancel(timeOutInteger);
+                            cb(false); 
                         }
                     });
                         

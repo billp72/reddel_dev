@@ -32,12 +32,10 @@ document.addEventListener("deviceready", onDeviceReady, false);
 
 angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controllers', 'mychat.services', 'mychat.directives', 'mychat.autocomplete', 'mychat.filters'])
 
-    .run(function ($ionicPlatform, $rootScope, $location, Auth, $ionicLoading, $window, $state, $timeout) {
+    .run(function ($ionicPlatform, $rootScope, $location, Auth, $ionicLoading, $window, $state, $timeout, $ionicPopup, ConnectionCheck) {
 
     $ionicPlatform.ready(function () {
 
-        /*
-        deps: $ionicPopup, ConnectionCheck
         ConnectionCheck.netCallback(function(state){
             if(state){
                 alertPopup = $ionicPopup.alert({
@@ -48,7 +46,7 @@ angular.module('mychat', ['ionic', 'firebase', 'angularMoment', 'mychat.controll
                     alertPopup.close();
                 }, 2000);
             }
-        });*/
+        });
             
         /*Google keys
          * key: AIzaSyAbXzuAUk1EICCdfpZhoA6-TleQrPWxJuI
